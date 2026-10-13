@@ -46,6 +46,7 @@ export function startPlayerAttack(state: GameState, id: TerritoryId): boolean {
   // Capangas ficam comprometidos durante a batalha
   state.crewInBattle += Math.min(state.crew - state.crewInBattle, Math.ceil(attackPower / 2));
   bus.emit('log', { message: `⚔️ Ataque iniciado a ${target.name}!` });
+  bus.emit('map:dirty', {});
   return true;
 }
 
@@ -58,6 +59,7 @@ export function tickBattles(state: GameState, deltaSec: number): void {
   battleTimer = 0;
 
   const remaining: Battle[] = [];
+  let mapChanged = false;
 
   for (const battle of state.activeBattles) {
     const territory = state.territories[battle.territoryId];
@@ -65,6 +67,7 @@ export function tickBattles(state: GameState, deltaSec: number): void {
     // Território já mudou de dono — batalha obsoleta
     if (territory.owner !== battle.defender) {
       if (battle.attacker === 'player') releasePlayerCrew(state);
+      mapChanged = true;
       continue;
     }
 
@@ -89,6 +92,7 @@ export function tickBattles(state: GameState, deltaSec: number): void {
 
     // Aumenta calor durante batalhas
     state.heat = Math.min(100, state.heat + 0.5);
+    mapChanged = true; // defesa mudou — mapas com barra de defesa precisam refletir
 
     // Verifica resolução
     if (territory.defense <= 0) {
@@ -118,6 +122,11 @@ export function tickBattles(state: GameState, deltaSec: number): void {
   }
 
   state.activeBattles = remaining;
+
+  // Notifica o mapa que algo relevante mudou (donos/defesas/batalhas)
+  if (mapChanged) {
+    bus.emit('map:dirty', {});
+  }
 }
 
 /** Libera os capangas quando as batalhas do jogador terminam. */

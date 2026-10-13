@@ -89,6 +89,7 @@ function initiateRivalAttack(state: GameState, attacker: FactionId, targetId: Te
     bus.emit('log', { message: `🚨 ${attackerFaction.name} está atacando ${territory.name}!` });
     bus.emit('rival_attack', { message: `${attackerFaction.name} ataca ${territory.name}`, faction: attacker });
   }
+  bus.emit('map:dirty', {});
 }
 
 /**

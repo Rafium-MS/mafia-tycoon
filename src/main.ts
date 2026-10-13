@@ -8,11 +8,11 @@ import { bribePolice } from './systems/HeatSystem';
 import { payCrew } from './systems/LoyaltySystem';
 import { recruitCrew } from './systems/CrewSystem';
 import { startPlayerAttack } from './systems/BattleSystem';
+import { MapRenderer } from './ui/MapRenderer';
 import type { BusinessId, TerritoryId, GameState } from './types/game';
 import {
   renderStats,
   renderBusinesses,
-  renderTerritories,
   renderCrew,
   renderBattles,
   renderLog,
@@ -28,6 +28,14 @@ const LOG_LIMIT = 50;
 let state: GameState = loadGame() ?? createInitialState();
 const loop = new GameLoop(state, render);
 
+// Cria o mapa UMA VEZ (ele se auto-renderiza)
+const mapContainer = document.getElementById('map')!;
+const mapRenderer = new MapRenderer(mapContainer, state);
+
+// >>> MAPA: re-renderiza apenas quando marcado como sujo (bus.emit('map:dirty'))
+let mapDirty = true;
+bus.on('map:dirty', () => { mapDirty = true; });
+
 /** Render completo da interface. */
 function render(): void {
   if (state.gameOver) {
@@ -38,19 +46,22 @@ function render(): void {
   }
   renderStats(state);
   renderBusinesses(state);
-  renderTerritories(state);
+  if (mapDirty) {
+    mapRenderer.render();
+    mapDirty = false;
+  }
   renderCrew(state);
   renderBattles(state);
   renderLog(state);
 }
 
 // ---------- EventBus -> log do jogo ----------
-bus.on<{ message: string }>('log', ({ message }) => {
+bus.on('log', ({ message }) => {
   state.log.push(message);
   if (state.log.length > LOG_LIMIT) state.log.shift();
 });
 
-bus.on<{ reason: string }>('gameover', () => {
+bus.on('gameover', () => {
   saveGame();
 });
 
