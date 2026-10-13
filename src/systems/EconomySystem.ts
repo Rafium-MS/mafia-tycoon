@@ -1,5 +1,5 @@
 // src/systems/EconomySystem.ts
-import type { GameState } from '../types/game';
+import type { GameState, BusinessId } from '../types/game';
 import { getCost } from '../core/GameState';
 import { getBusinessMultiplier } from './TerritorySystem';
 import { bus } from '../core/EventBus';
@@ -9,7 +9,7 @@ export function tickEconomy(state: GameState, deltaSec: number): void {
 
   for (const b of Object.values(state.businesses)) {
     if (b.count > 0) {
-      // APLICA O BÔNUS DE TERRITÓRIO
+      // Aplica o bônus de território
       const multiplier = getBusinessMultiplier(state, b.id);
       income += b.baseIncome * b.count * multiplier * deltaSec;
     }
@@ -17,36 +17,23 @@ export function tickEconomy(state: GameState, deltaSec: number): void {
 
   state.money += income;
   if (income > 0) bus.emit('income', { amount: income });
-}
 
-export function buyBusiness(state: GameState, id: keyof typeof state.businesses): boolean {
-  const b = state.businesses[id];
-  const cost = getCost(b);
-  if (!b.unlocked || state.money < cost) return false;
-  state.money -= cost;
-  b.count += 1;
-  return true;
-}
-
-export function tickEconomy(state: GameState, deltaSec: number): void {
-  let income = 0;
-
+  // Desbloqueio por respeito (checado a cada tick da economia)
   for (const b of Object.values(state.businesses)) {
-    if (b.count > 0) {
-      income += b.baseIncome * b.count * deltaSec;
+    if (!b.unlocked && state.respect >= b.requiresRespect) {
+      b.unlocked = true;
+      bus.emit('log', { message: `🔓 Novo esquema disponível: ${b.name}!` });
     }
   }
-
-  state.money += income;
-  if (income > 0) bus.emit('income', { amount: income });
 }
 
-export function buyBusiness(state: GameState, id: keyof typeof state.businesses): boolean {
+export function buyBusiness(state: GameState, id: BusinessId): boolean {
   const b = state.businesses[id];
+  if (!b) return false;
   const cost = getCost(b);
   if (!b.unlocked || state.money < cost) return false;
-
   state.money -= cost;
   b.count += 1;
+  bus.emit('log', { message: `💼 ${b.name} expandida (x${b.count}).` });
   return true;
 }

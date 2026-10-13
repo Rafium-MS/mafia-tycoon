@@ -1,11 +1,12 @@
 // src/systems/BattleSystem.ts
-import type { GameState, TerritoryId, FactionId, Battle } from '../types/game';
+import type { GameState, TerritoryId, Battle } from '../types/game';
 import { bus } from '../core/EventBus';
-import { getPlayerAttackPower } from './TerritorySystem';
+import { getPlayerAttackPower, getConquestCost } from './TerritorySystem';
 
-const BATTLE_TICK_INTERVAL = 2;   // batalhas resolvem a cada 2s
-const BATTLE_COST_CREW_LOSS = 0.15; // 15% de chance de perder 1 capanga por tick
+const BATTLE_TICK_INTERVAL = 2;      // batalhas resolvem a cada 2s
+const CREW_LOSS_CHANCE = 0.15;       // chance de perder 1 capanga por resolução
 
+// Timer de resolução de batalhas (fora do estado serializável)
 let battleTimer = 0;
 
 /**
@@ -13,9 +14,12 @@ let battleTimer = 0;
  */
 export function startPlayerAttack(state: GameState, id: TerritoryId): boolean {
   const target = state.territories[id];
-  if (target.owner === 'player') return false;
+  if (!target || target.owner === 'player') return false;
 
-  const cost = target.conquestCost;
+  // Já existe batalha neste território?
+  if (state.activeBattles.some(b => b.territoryId === id)) return false;
+
+  const cost = getConquestCost(state, id);
   const attackPower = getPlayerAttackPower(state);
 
   if (state.money < cost) {
@@ -39,6 +43,8 @@ export function startPlayerAttack(state: GameState, id: TerritoryId): boolean {
   };
 
   state.activeBattles.push(battle);
+  // Capangas ficam comprometidos durante a batalha
+  state.crewInBattle += Math.min(state.crew - state.crewInBattle, Math.ceil(attackPower / 2));
   bus.emit('log', { message: `⚔️ Ataque iniciado a ${target.name}!` });
   return true;
 }
@@ -56,28 +62,29 @@ export function tickBattles(state: GameState, deltaSec: number): void {
   for (const battle of state.activeBattles) {
     const territory = state.territories[battle.territoryId];
 
-    // IA defende se ainda possui
+    // Território já mudou de dono — batalha obsoleta
     if (territory.owner !== battle.defender) {
-      // Território já foi tomado por outro - batalha obsoleta
+      if (battle.attacker === 'player') releasePlayerCrew(state);
       continue;
     }
 
-    // Aplica dano de ambos os lados
+    // Aplica dano do atacante na defesa (com variância ±20%)
     const attackRoll = battle.attackerPower * (0.8 + Math.random() * 0.4);
-    const defenseRoll = battle.defenderPower * (0.8 + Math.random() * 0.4);
-
-    // Atacante causa dano na defesa
     territory.defense = Math.max(0, territory.defense - attackRoll * 0.5);
 
-    // Defensor causa baixas no atacante
+    // Defensor causa baixas no atacante jogador
     if (battle.attacker === 'player') {
-      if (Math.random() < BATTLE_COST_CREW_LOSS) {
+      if (Math.random() < CREW_LOSS_CHANCE) {
         state.crew = Math.max(0, state.crew - 1);
+        state.crewInBattle = Math.min(state.crewInBattle, state.crew);
         bus.emit('log', { message: `💀 Você perdeu um capanga na guerra.` });
       }
     } else {
-      // IA atacando o jogador
-      territory.defense = Math.max(0, territory.defense - attackRoll * 0.5);
+      // IA atacando: defensor (incluindo territórios do jogador) revida
+      // e reduz o poder da facção atacante a cada resolução
+      const defenseRoll = territory.defense * (0.8 + Math.random() * 0.4);
+      const attackerFaction = state.factions[battle.attacker];
+      attackerFaction.power = Math.max(5, attackerFaction.power - defenseRoll * 0.3);
     }
 
     // Aumenta calor durante batalhas
@@ -87,20 +94,21 @@ export function tickBattles(state: GameState, deltaSec: number): void {
     if (territory.defense <= 0) {
       const previousOwner = territory.owner;
       territory.owner = battle.attacker;
-      territory.defense = battle.attacker === 'player' ? 30 : territory.defense; // re-fortifica
+      territory.defense = 30; // re-fortifica após conquista
 
-      // Recompensa de respeito por conquistar
       if (battle.attacker === 'player') {
+        releasePlayerCrew(state);
         state.respect += 25;
-        bus.emit('log', { message: `🏆 Você tomou ${territory.name} de ${previousOwner}!` });
-      } else {
-        bus.emit('log', { message: `💥 Você perdeu ${territory.name} para ${battle.attacker}!` });
-      }
-
-      // IA retalia - fica ciente do jogador
-      const attackerFaction = state.factions[battle.attacker];
-      if (battle.attacker === 'player') {
+        const prevName = state.factions[previousOwner].name;
+        bus.emit('log', { message: `🏆 Você tomou ${territory.name} de ${prevName}!` });
+        // Facção derrotada fica ciente do jogador e quer retomar
         state.factions[previousOwner].awareOfPlayer = true;
+      } else {
+        const attackerName = state.factions[battle.attacker].name;
+        bus.emit('log', { message: `💥 Você perdeu ${territory.name} para ${attackerName}!` });
+        // Perder território derruba respeito e lealdade
+        state.respect = Math.max(0, state.respect - 10);
+        state.loyalty = Math.max(0, state.loyalty - 5);
       }
       continue;
     }
@@ -110,4 +118,10 @@ export function tickBattles(state: GameState, deltaSec: number): void {
   }
 
   state.activeBattles = remaining;
+}
+
+/** Libera os capangas quando as batalhas do jogador terminam. */
+function releasePlayerCrew(state: GameState): void {
+  const playerStillFighting = state.activeBattles.some(b => b.attacker === 'player');
+  if (!playerStillFighting) state.crewInBattle = 0;
 }

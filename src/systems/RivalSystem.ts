@@ -1,9 +1,11 @@
 // src/systems/RivalSystem.ts
-import type { GameState, TerritoryId, FactionId } from '../types/game';
+import type { GameState, TerritoryId, FactionId, Battle } from '../types/game';
 import { bus } from '../core/EventBus';
 
-let rivalTimer = 0;
 const RIVAL_TICK_INTERVAL = 5;   // IA age a cada 5s
+
+// Timer da IA (fora do estado serializável)
+let rivalTimer = 0;
 
 /**
  * Cada facção ganha poder passivamente e, se agressiva, ataca territórios.
@@ -27,7 +29,7 @@ export function tickRivals(state: GameState, deltaSec: number): void {
     if (Math.random() > faction.aggression * 0.3) continue;
 
     // Se ainda não está ciente do jogador, ataca rivais
-    // Se está ciente, prioriza territórios do jogador vizinhos aos seus
+    // Se está ciente, prioriza territórios dele vizinhos aos seus
     const targets = pickTargets(state, faction.id);
 
     if (targets.length === 0) continue;
@@ -72,7 +74,7 @@ function initiateRivalAttack(state: GameState, attacker: FactionId, targetId: Te
   // Se já existe batalha nesse território, ignora
   if (state.activeBattles.some(b => b.territoryId === targetId)) return;
 
-  const battle = {
+  const battle: Battle = {
     territoryId: targetId,
     attacker,
     defender: territory.owner,
@@ -85,6 +87,7 @@ function initiateRivalAttack(state: GameState, attacker: FactionId, targetId: Te
 
   if (territory.owner === 'player') {
     bus.emit('log', { message: `🚨 ${attackerFaction.name} está atacando ${territory.name}!` });
+    bus.emit('rival_attack', { message: `${attackerFaction.name} ataca ${territory.name}`, faction: attacker });
   }
 }
 

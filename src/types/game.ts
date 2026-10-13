@@ -1,38 +1,20 @@
 // src/types/game.ts
 
 export type BusinessId = 'loan_shark' | 'protection' | 'numbers' | 'smuggling' | 'casino';
-export type FactionId = 'police' | 'rival_marcone' | 'rival_tongs' | 'rival_bratva';
+export type TerritoryId = 'little_italy' | 'docks' | 'downtown' | 'chinatown' | 'red_light';
+export type FactionId = 'player' | 'marcone' | 'tongs' | 'bratva' | 'police';
 
 export interface Business {
   id: BusinessId;
   name: string;
   description: string;
   baseCost: number;
-  baseIncome: number;      // $ por segundo por unidade
+  baseIncome: number;      // R$ por segundo por unidade
   baseHeat: number;        // calor por segundo por unidade
   count: number;           // quantos você possui
   unlocked: boolean;
   requiresRespect: number; // respeito mínimo para desbloquear
 }
-
-export interface GameState {
-  money: number;
-  respect: number;         // desbloqueia coisas
-  heat: number;            // 0-100; ao chegar em 100 = prisão
-  loyalty: number;         // 0-100; baixa = traição
-  businesses: Record<BusinessId, Business>;
-  territory: TerritoryId[]; // territórios controlados
-  crew: number;            // número de capangas
-  gameOver: boolean;
-  gameOverReason?: string;
-  lastTick: number;
-}
-
-// src/types/game.ts (adicionar/atualizar)
-
-export type TerritoryId = 'little_italy' | 'docks' | 'downtown' | 'chinatown' | 'red_light';
-
-export type FactionId = 'player' | 'marcone' | 'tongs' | 'bratva' | 'police';
 
 export interface Territory {
   id: TerritoryId;
@@ -71,17 +53,24 @@ export interface Battle {
 }
 
 export interface GameState {
-  // ...campos anteriores
+  money: number;
+  respect: number;         // desbloqueia coisas
+  heat: number;            // 0-100; ao chegar em 100 = prisão
+  loyalty: number;         // 0-100; baixa = traição
+  businesses: Record<BusinessId, Business>;
   territories: Record<TerritoryId, Territory>;
   factions: Record<FactionId, Faction>;
   activeBattles: Battle[];
-  crew: number;               // capangas (poder militar do jogador)
-  crewInBattle: number;       // capangas comprometidos em batalha
-  log: string[];              // histórico de eventos
+  crew: number;            // capangas (poder militar do jogador)
+  crewInBattle: number;    // capangas comprometidos em batalha
+  gameOver: boolean;
+  gameOverReason?: string;
+  lastTick: number;
+  log: string[];           // histórico de eventos
 }
 
 export interface GameEvent {
-  type: 'income' | 'heat' | 'loyalty' | 'unlock' | 'gameover' | 'rival_attack';
+  type: 'income' | 'heat' | 'loyalty' | 'unlock' | 'gameover' | 'rival_attack' | 'log';
   message: string;
   timestamp: number;
 }

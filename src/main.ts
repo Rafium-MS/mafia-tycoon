@@ -1,149 +1,104 @@
 // src/main.ts
-import { createInitialState, getCost } from './core/GameState';
+import './ui/styles.css';
+import { createInitialState } from './core/GameState';
 import { GameLoop } from './core/GameLoop';
+import { bus } from './core/EventBus';
 import { buyBusiness } from './systems/EconomySystem';
 import { bribePolice } from './systems/HeatSystem';
 import { payCrew } from './systems/LoyaltySystem';
-import { bus } from './core/EventBus';
-import type { BusinessId } from './types/game';
-
-const state = createInitialState();
-const loop = new GameLoop(state, render);
-loop.start();
-
-const $ = (id: string) => document.getElementById(id)!;
-// src/main.ts (adicionar ao render)
-
-import { getCrewRecruitCost, recruitCrew } from './systems/CrewSystem';
-import { getConquestCost, canAttack, getPlayerAttackPower } from './systems/TerritorySystem';
+import { recruitCrew } from './systems/CrewSystem';
 import { startPlayerAttack } from './systems/BattleSystem';
+import type { BusinessId, TerritoryId, GameState } from './types/game';
+import {
+  renderStats,
+  renderBusinesses,
+  renderTerritories,
+  renderCrew,
+  renderBattles,
+  renderLog,
+  renderGameOver,
+  BRIBE_COST,
+  BRIBE_HEAT_REDUCTION,
+  PAY_CREW_COST,
+} from './ui/renderer';
 
-function renderTerritories(): void {
-  const container = $('territories');
-  container.innerHTML = '';
+const SAVE_KEY = 'mafia-tycoon-save';
+const LOG_LIMIT = 50;
 
-  for (const t of Object.values(state.territories)) {
-    const owner = state.factions[t.owner];
-    const attackable = canAttack(state, t.id);
-    const cost = getConquestCost(state, t.id);
-    const battle = state.activeBattles.find(b => b.territoryId === t.id);
+let state: GameState = loadGame() ?? createInitialState();
+const loop = new GameLoop(state, render);
 
-    let actionHtml = '';
-    if (battle) {
-      actionHtml = `<span class="battle">⚔️ EM BATALHA</span>`;
-    } else if (attackable) {
-      actionHtml = `<button data-attack="${t.id}" ${state.money >= cost ? '' : 'disabled'}>Atacar (R$ ${cost})</button>`;
-    }
-
-    container.innerHTML += `
-      <div class="territory" style="border-left: 4px solid ${owner.color}">
-        <div class="terr-header">
-          <strong>${t.name}</strong>
-          <span class="owner" style="color: ${owner.color}">${owner.name}</span>
-        </div>
-        <div class="desc">${t.description}</div>
-        <div class="bonus">Bônus: +${Math.round(t.bonus.multiplier * 100)}% em ${state.businesses[t.bonus.business].name}</div>
-        <div class="defense">Defesa: ${t.defense.toFixed(0)}</div>
-        ${actionHtml}
-      </div>
-    `;
-  }
-}
-
-function renderBattles(): void {
-  const container = $('battles');
-  if (state.activeBattles.length === 0) {
-    container.innerHTML = '<div class="desc">Nenhuma batalha em andamento.</div>';
-    return;
-  }
-  container.innerHTML = state.activeBattles.map(b => {
-    const t = state.territories[b.territoryId];
-    const attacker = state.factions[b.attacker];
-    return `<div class="battle-row">
-      ${attacker.name} atacando ${t.name} — Defesa restante: ${t.defense.toFixed(0)}
-    </div>`;
-  }).join('');
-}
-
-// Dentro do render(), adicionar:
-renderTerritories();
-renderBattles();
-$('crew').textContent = String(state.crew);
-$('recruit-cost').textContent = String(getCrewRecruitCost(state));
-($('recruit') as HTMLButtonElement).disabled = state.money < getCrewRecruitCost(state);
-
-// E no handler de cliques:
-document.addEventListener('click', (e) => {
-  const target = e.target as HTMLElement;
-  if (target.tagName === 'BUTTON') {
-    if (target.dataset.id) buyBusiness(state, target.dataset.id as BusinessId);
-    if (target.dataset.attack) startPlayerAttack(state, target.dataset.attack as TerritoryId);
-    if (target.id === 'recruit') recruitCrew(state);
-    // ... resto
-  }
-});
+/** Render completo da interface. */
 function render(): void {
   if (state.gameOver) {
-    $('app').innerHTML = `
-      <h1>💀 FIM DE JOGO</h1>
-      <p>${state.gameOverReason}</p>
-      <p>Dinheiro final: R$ ${state.money.toFixed(0)}</p>
-      <p>Respeito: ${state.respect}</p>
-    `;
+    renderGameOver(state);
     loop.stop();
+    localStorage.removeItem(SAVE_KEY);
     return;
   }
-
-  $('money').textContent = state.money.toFixed(0);
-  $('respect').textContent = state.respect.toFixed(0);
-  $('heat').textContent = state.heat.toFixed(1);
-  $('loyalty').textContent = state.loyalty.toFixed(0);
-
-  // Barra de calor
-  ($('heat-bar') as HTMLElement).style.width = `${state.heat}%`;
-
-  // Lista de negócios
-  const list = $('businesses');
-  list.innerHTML = '';
-  for (const [id, b] of Object.entries(state.businesses)) {
-    if (!b.unlocked) {
-      list.innerHTML += `<div class="biz locked">🔒 ${b.name} (Requer ${b.requiresRespect} respeito)</div>`;
-      continue;
-    }
-    const cost = getCost(b);
-    const canBuy = state.money >= cost;
-    list.innerHTML += `
-      <div class="biz">
-        <div>
-          <strong>${b.name}</strong> x${b.count}
-          <div class="desc">${b.description} • +R$${b.baseIncome}/s • 🔥+${b.baseHeat}/s</div>
-        </div>
-        <button data-id="${id}" ${canBuy ? '' : 'disabled'}>Comprar (R$ ${cost})</button>
-      </div>
-    `;
-  }
-
-  // Ações
-  ($('bribe') as HTMLButtonElement).textContent = `💸 Subornar Polícia (-20 calor) — R$ 200`;
-  ($('pay') as HTMLButtonElement).textContent = `🤝 Pagar Família (+10 lealdade) — R$ 100`;
+  renderStats(state);
+  renderBusinesses(state);
+  renderTerritories(state);
+  renderCrew(state);
+  renderBattles(state);
+  renderLog(state);
 }
 
-// Eventos de UI
-document.addEventListener('click', (e) => {
-  const target = e.target as HTMLElement;
-  if (target.tagName === 'BUTTON' && target.dataset.id) {
-    buyBusiness(state, target.dataset.id as BusinessId);
-  }
-  if (target.id === 'bribe') bribePolice(state, 200, 20);
-  if (target.id === 'pay') payCrew(state, 100);
+// ---------- EventBus -> log do jogo ----------
+bus.on<{ message: string }>('log', ({ message }) => {
+  state.log.push(message);
+  if (state.log.length > LOG_LIMIT) state.log.shift();
 });
 
-// Desbloqueio por respeito
-bus.on('income', () => {
-  // a cada tick checa unlocks
-  for (const b of Object.values(state.businesses)) {
-    if (!b.unlocked && state.respect >= b.requiresRespect) {
-      b.unlocked = true;
-    }
+bus.on<{ reason: string }>('gameover', () => {
+  saveGame();
+});
+
+// ---------- Persistência ----------
+function saveGame(): void {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  } catch {
+    /* armazenamento indisponível — segue sem salvar */
+  }
+}
+
+function loadGame(): GameState | null {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as GameState;
+    // Sanidade mínima: só carrega saves com a estrutura esperada
+    if (typeof parsed.money !== 'number' || !parsed.businesses || !parsed.territories) return null;
+    parsed.lastTick = performance.now();
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+setInterval(saveGame, 5000);
+window.addEventListener('beforeunload', saveGame);
+
+// ---------- Eventos de UI (delegação única) ----------
+document.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement;
+  if (target.tagName !== 'BUTTON') return;
+
+  if (target.dataset.id) {
+    buyBusiness(state, target.dataset.id as BusinessId);
+  } else if (target.dataset.attack) {
+    startPlayerAttack(state, target.dataset.attack as TerritoryId);
+  } else if (target.id === 'recruit') {
+    recruitCrew(state);
+  } else if (target.id === 'bribe') {
+    bribePolice(state, BRIBE_COST, BRIBE_HEAT_REDUCTION);
+  } else if (target.id === 'pay') {
+    payCrew(state, PAY_CREW_COST);
+  } else if (target.id === 'restart') {
+    localStorage.removeItem(SAVE_KEY);
+    location.reload();
   }
 });
+
+loop.start();

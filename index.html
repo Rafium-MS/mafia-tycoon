@@ -1,57 +1,42 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Máfia Tycoon</title>
-  <style>
-    body { font-family: 'Courier New', monospace; background: #0d0d0d; color: #e0e0e0; margin: 0; padding: 20px; }
-    #app { max-width: 800px; margin: 0 auto; }
-    h1 { color: #b8232b; text-shadow: 0 0 10px #b8232b; }
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
-    .stat { background: #1a1a1a; padding: 12px; border-radius: 6px; border-left: 3px solid #b8232b; }
-    .stat .label { font-size: 0.75em; color: #888; text-transform: uppercase; }
-    .stat .value { font-size: 1.4em; font-weight: bold; color: #d4a574; }
-    .heat-container { background: #1a1a1a; height: 20px; border-radius: 10px; overflow: hidden; margin: 15px 0; }
-    #heat-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #4a8b2c, #d4a574, #b8232b); transition: width 0.3s; }
-    .biz { display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 12px; margin: 8px 0; border-radius: 6px; }
-    .biz.locked { opacity: 0.4; }
-    .biz .desc { font-size: 0.8em; color: #888; margin-top: 4px; }
-    button { background: #b8232b; color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-family: inherit; font-weight: bold; }
-    button:hover:not(:disabled) { background: #d42d36; }
-    button:disabled { background: #333; cursor: not-allowed; opacity: 0.5; }
-    .actions { margin: 20px 0; display: flex; gap: 10px; }
-  </style>
 </head>
 <body>
-  <div id="app">
+  <main id="app">
     <h1>🔫 MÁFIA TYCOON</h1>
-    <div class="stats">
+    <div class="stats" aria-label="Status da família">
       <div class="stat"><div class="label">Dinheiro</div><div class="value">R$ <span id="money">0</span></div></div>
       <div class="stat"><div class="label">Respeito</div><div class="value"><span id="respect">0</span></div></div>
       <div class="stat"><div class="label">Calor Policial</div><div class="value"><span id="heat">0</span>%</div></div>
       <div class="stat"><div class="label">Lealdade</div><div class="value"><span id="loyalty">100</span>%</div></div>
     </div>
-    <div class="heat-container"><div id="heat-bar"></div></div>
+    <div class="heat-container" role="progressbar" aria-label="Nível de calor policial"><div id="heat-bar"></div></div>
     <div class="actions">
       <button id="bribe">💸 Subornar Polícia</button>
       <button id="pay">🤝 Pagar Família</button>
     </div>
     <h2>Esquemas</h2>
     <div id="businesses"></div>
-  </div>
-  <!-- Adicionar depois da lista de businesses -->
-<h2>🗺️ Territórios</h2>
-<div id="territories"></div>
 
-<h2>👥 Capangas</h2>
-<div class="actions">
-  <button id="recruit">Recrutar Capanga — R$ <span id="recruit-cost">0</span></button>
-  <span>Total: <span id="crew">0</span></span>
-</div>
+    <h2>🗺️ Territórios</h2>
+    <div id="territories"></div>
 
-<h2>⚔️ Batalhas Ativas</h2>
-<div id="battles"></div>
+    <h2>👥 Capangas</h2>
+    <div class="actions">
+      <button id="recruit">Recrutar Capanga — R$ <span id="recruit-cost">0</span></button>
+      <span>Total: <span id="crew">0</span></span>
+    </div>
+
+    <h2>⚔️ Batalhas Ativas</h2>
+    <div id="battles"></div>
+
+    <h2>📰 Boletim da Família</h2>
+    <div id="log" aria-live="polite"></div>
+  </main>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

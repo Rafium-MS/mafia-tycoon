@@ -1,6 +1,9 @@
 // src/systems/TerritorySystem.ts
 import type { GameState, TerritoryId, BusinessId } from '../types/game';
-import { bus } from '../core/EventBus';
+
+/** Constante de balanceamento: desconto por vizinho aliado ao cercar o alvo. */
+const SIEGE_DISCOUNT_PER_NEIGHBOR = 0.1;
+const MIN_CONQUEST_COST = 100; // clamp: custo nunca fica irrisório
 
 /**
  * Calcula o multiplicador total para um negócio baseado nos territórios controlados.
@@ -41,11 +44,12 @@ export function getPlayerAttackPower(state: GameState): number {
 }
 
 /**
- * Custo de conquista: aumenta se o território já foi atacado antes (defesa reforçada).
+ * Custo de conquista: diminui conforme você cerca o alvo com territórios aliados.
  */
 export function getConquestCost(state: GameState, id: TerritoryId): number {
   const t = state.territories[id];
   // Cada vizinho do jogador dá um pequeno desconto (cercar o alvo)
   const friendlyNeighbors = t.neighbors.filter(n => state.territories[n].owner === 'player').length;
-  return Math.floor(t.conquestCost * (1 - friendlyNeighbors * 0.1));
+  const discounted = t.conquestCost * (1 - friendlyNeighbors * SIEGE_DISCOUNT_PER_NEIGHBOR);
+  return Math.max(MIN_CONQUEST_COST, Math.floor(discounted));
 }
