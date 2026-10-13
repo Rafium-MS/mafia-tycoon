@@ -6,6 +6,7 @@ import { tickLoyalty } from '../systems/LoyaltySystem';
 import { tickBattles } from '../systems/BattleSystem';
 import { tickRivals, getPassiveHeatReduction } from '../systems/RivalSystem';
 import { tickCrewUpkeep } from '../systems/CrewSystem';
+import { checkVictory } from '../systems/TerritorySystem';
 
 export class GameLoop {
   private accumulator = 0;
@@ -63,5 +64,8 @@ export class GameLoop {
 
     // Bônus passivo: territórios controlados reduzem calor
     this.state.heat = Math.max(0, this.state.heat - getPassiveHeatReduction(this.state) * dt);
+
+    // Derrota no mesmo tick tem prioridade sobre a vitória
+    if (!this.state.gameOver) checkVictory(this.state);
   }
 }

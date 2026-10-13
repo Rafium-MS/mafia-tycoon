@@ -1,5 +1,6 @@
 // src/systems/TerritorySystem.ts
 import type { GameState, TerritoryId, BusinessId } from '../types/game';
+import { bus } from '../core/EventBus';
 
 /** Constante de balanceamento: desconto por vizinho aliado ao cercar o alvo. */
 const SIEGE_DISCOUNT_PER_NEIGHBOR = 0.1;
@@ -24,6 +25,18 @@ export function getPlayerTerritories(state: GameState): TerritoryId[] {
   return Object.values(state.territories)
     .filter(t => t.owner === 'player')
     .map(t => t.id);
+}
+
+/**
+ * Vitória: o jogador controla todos os territórios do mapa.
+ */
+export function checkVictory(state: GameState): void {
+  const all = Object.values(state.territories);
+  if (!all.every(t => t.owner === 'player')) return;
+  state.gameOver = true;
+  state.won = true;
+  state.gameOverReason = 'A cidade inteira é sua. Ninguém mais ousa te desafiar.';
+  bus.emit('log', { message: `👑 Você dominou a cidade!` });
 }
 
 /**

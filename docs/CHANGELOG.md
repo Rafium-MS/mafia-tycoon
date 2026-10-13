@@ -6,6 +6,7 @@ Versionamento semântico: MAJOR.MINOR.PATCH.
 ## [0.3.1] — 2026-10-13
 
 ### Adicionado
+- Condição de vitória: controlar os 5 territórios encerra a partida com a tela "👑 VITÓRIA"
 - Esquemas geram respeito passivo (`baseRespect`), tornando Contrabando e Cassino alcançáveis
 
 ### Corrigido

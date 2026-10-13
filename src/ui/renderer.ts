@@ -133,15 +133,17 @@ export function renderLog(state: GameState): void {
     : '<div class="desc">Sem novidades… por enquanto.</div>');
 }
 
-/** Tela de fim de jogo. */
+/** Tela de fim de jogo (vitória ou derrota). */
 export function renderGameOver(state: GameState): void {
+  const title = state.won ? '👑 VITÓRIA' : '💀 FIM DE JOGO';
+  const fallback = state.won ? 'A cidade é sua.' : 'A família caiu.';
   $('app').innerHTML = `
-    <h1>💀 FIM DE JOGO</h1>
-    <p>${state.gameOverReason ?? 'A família caiu.'}</p>
+    <h1>${title}</h1>
+    <p>${state.gameOverReason ?? fallback}</p>
     <p>Dinheiro final: R$ ${state.money.toFixed(0)}</p>
     <p>Respeito: ${state.respect.toFixed(0)}</p>
     <p>Territórios conquistados: ${Object.values(state.territories).filter(t => t.owner === 'player').length}</p>
-    <button id="restart">🔄 Recomeçar</button>
+    <button id="restart">${state.won ? '🔄 Jogar de novo' : '🔄 Recomeçar'}</button>
   `;
 }
 
