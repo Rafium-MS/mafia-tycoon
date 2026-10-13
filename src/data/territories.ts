@@ -1,16 +1,42 @@
 // src/data/territories.ts
 import type { Territory, TerritoryId, Faction, FactionId } from '../types/game';
 
+/** Posição/raio visual de um território no mapa SVG. */
+export interface TerritoryVisual {
+  x: number;      // 0-800 (coordenada SVG)
+  y: number;      // 0-500
+  radius: number; // tamanho do nó
+}
+
+// Mapa pensado para caber em viewBox "0 0 800 500"
+export const TERRITORY_POSITIONS: Record<TerritoryId, TerritoryVisual> = {
+  little_italy: { x: 220, y: 350, radius: 55 },  // sudoeste (berço)
+  docks:        { x: 180, y: 150, radius: 60 },  // noroeste (porto)
+  downtown:     { x: 420, y: 260, radius: 65 },  // centro
+  chinatown:    { x: 620, y: 380, radius: 60 },  // sudeste
+  red_light:    { x: 620, y: 130, radius: 65 },  // nordeste (zona rica)
+};
+
+/** Nomes curtos exibidos dentro dos nós do mapa SVG. */
+export const TERRITORY_SHORT_NAMES: Record<TerritoryId, string> = {
+  little_italy: 'Little Italy',
+  docks: 'Porto',
+  downtown: 'Centro',
+  chinatown: 'Chinatown',
+  red_light: 'Red Light',
+};
+
+// Vizinhos ajustados para ficar visualmente coerentes com o mapa
 export const TERRITORY_DEFS: Record<TerritoryId, Omit<Territory, 'owner'>> = {
   little_italy: {
     id: 'little_italy',
-    name: 'Little Italy',
+    name: TERRITORY_SHORT_NAMES.little_italy,
     description: 'Berço da família. Ruas que te conhecem.',
     bonus: { business: 'loan_shark', multiplier: 0.5 },
     conquestCost: 0,
     defense: 10,
     originalOwner: 'player',
-    neighbors: ['downtown', 'docks'],
+    neighbors: ['docks', 'downtown'],   // (era downtown, docks) — sem mudança visual
   },
   docks: {
     id: 'docks',
@@ -30,7 +56,7 @@ export const TERRITORY_DEFS: Record<TerritoryId, Omit<Territory, 'owner'>> = {
     conquestCost: 3000,
     defense: 25,
     originalOwner: 'police',
-    neighbors: ['little_italy', 'docks', 'chinatown'],
+    neighbors: ['little_italy', 'docks', 'chinatown', 'red_light'],
   },
   chinatown: {
     id: 'chinatown',
@@ -50,7 +76,7 @@ export const TERRITORY_DEFS: Record<TerritoryId, Omit<Territory, 'owner'>> = {
     conquestCost: 60000,
     defense: 90,
     originalOwner: 'bratva',
-    neighbors: ['docks', 'chinatown'],
+    neighbors: ['docks', 'downtown', 'chinatown'],
   },
 };
 

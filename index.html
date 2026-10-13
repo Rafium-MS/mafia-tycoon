@@ -15,27 +15,26 @@
       <div class="stat"><div class="label">Lealdade</div><div class="value"><span id="loyalty">100</span>%</div></div>
     </div>
     <div class="heat-container" role="progressbar" aria-label="Nível de calor policial"><div id="heat-bar"></div></div>
-    <div class="actions">
-      <button id="bribe">💸 Subornar Polícia</button>
-      <button id="pay">🤝 Pagar Família</button>
-    </div>
-    <h2>Esquemas</h2>
-    <div id="businesses"></div>
 
-    <h2>🗺️ Territórios</h2>
-    <div id="territories"></div>
+    <!-- MAPA -->
+    <h2>🗺️ Mapa da Cidade</h2>
+    <div id="map" class="map-container"></div>
 
-    <h2>👥 Capangas</h2>
     <div class="actions">
-      <button id="recruit">Recrutar Capanga — R$ <span id="recruit-cost">0</span></button>
-      <span>Total: <span id="crew">0</span></span>
+      <button id="bribe">💸 Subornar Polícia (-20 calor) — R$ 200</button>
+      <button id="pay">🤝 Pagar Família (+10 lealdade) — R$ 100</button>
+      <button id="recruit">👤 Recrutar Capanga — R$ <span id="recruit-cost">0</span></button>
+      <span style="align-self:center; color:#d4a574;">Capangas: <strong id="crew">0</strong></span>
     </div>
 
     <h2>⚔️ Batalhas Ativas</h2>
     <div id="battles"></div>
 
-    <h2>📰 Boletim da Família</h2>
-    <div id="log" aria-live="polite"></div>
+    <h2>🏴 Esquemas</h2>
+    <div id="businesses"></div>
+
+    <h2>📜 Registro</h2>
+    <div id="log" class="log" aria-live="polite"></div>
   </main>
   <script type="module" src="/src/main.ts"></script>
 </body>

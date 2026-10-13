@@ -130,6 +130,7 @@ export function renderGameOver(state: GameState): void {
     <p>${state.gameOverReason ?? 'A família caiu.'}</p>
     <p>Dinheiro final: R$ ${state.money.toFixed(0)}</p>
     <p>Respeito: ${state.respect.toFixed(0)}</p>
+    <p>Territórios conquistados: ${Object.values(state.territories).filter(t => t.owner === 'player').length}</p>
     <button id="restart">🔄 Recomeçar</button>
   `;
 }

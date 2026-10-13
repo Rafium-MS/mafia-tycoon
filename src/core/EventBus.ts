@@ -1,16 +1,17 @@
 // src/core/EventBus.ts
+import type { EventMap } from './EventMap';
 
 type Handler<T> = (payload: T) => void;
 
 export class EventBus {
-  private handlers = new Map<string, Handler<any>[]>();
+  private handlers = new Map<keyof EventMap, Handler<any>[]>();
 
-  on<T>(event: string, handler: Handler<T>): void {
+  on<K extends keyof EventMap>(event: K, handler: (payload: EventMap[K]) => void): void {
     if (!this.handlers.has(event)) this.handlers.set(event, []);
     this.handlers.get(event)!.push(handler);
   }
 
-  emit<T>(event: string, payload: T): void {
+  emit<K extends keyof EventMap>(event: K, payload: EventMap[K]): void {
     this.handlers.get(event)?.forEach(h => h(payload));
   }
 }
