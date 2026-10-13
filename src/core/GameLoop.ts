@@ -1,6 +1,6 @@
 // src/core/GameLoop.ts
 import type { GameState } from '../types/game';
-import { tickEconomy } from '../systems/EconomySystem';
+import { tickEconomy, tickBankruptcy } from '../systems/EconomySystem';
 import { tickHeat } from '../systems/HeatSystem';
 import { tickLoyalty } from '../systems/LoyaltySystem';
 import { tickBattles } from '../systems/BattleSystem';
@@ -59,6 +59,7 @@ export class GameLoop {
     tickHeat(this.state, dt);
     tickLoyalty(this.state, dt);
     tickCrewUpkeep(this.state, dt);
+    tickBankruptcy(this.state, dt);
     tickBattles(this.state, dt);
     tickRivals(this.state, dt);
 

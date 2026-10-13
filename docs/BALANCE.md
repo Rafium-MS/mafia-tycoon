@@ -8,7 +8,7 @@
 5. `tickBattles` — resolve batalhas ativas
 6. `tickRivals` — IA das facções
 7. Aplicar redução passiva de calor (bônus de territórios)
-8. Checar condições de derrota (calor/lealdade, dentro de cada sistema)
+8. Checar condições de derrota (calor/lealdade/falência, dentro de cada sistema; `tickBankruptcy` roda logo após `tickCrewUpkeep`)
 9. Checar vitória (`checkVictory`) — só se a derrota não ocorreu no mesmo tick
 
 Ordem importa: batalhas antes de IA, porque a IA pode atacar um

@@ -51,7 +51,7 @@ Tycoon clássico é "números sobem". Aqui, **números sobem com risco**:
 **Tick:** 10 vezes por segundo (0.1s).
 **Sessão alvo:** 15-30 minutos por partida.
 **Vitória:** controlar todos os 5 territórios.
-**Derrota:** calor = 100, lealdade = 0, ou dinheiro = 0 por muito tempo.
+**Derrota:** calor = 100, lealdade = 0, ou falência prolongada: 60s seguidos com renda líquida ≤ 0 e dinheiro abaixo do esquema mais barato.
 
 ---
 

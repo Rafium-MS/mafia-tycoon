@@ -7,6 +7,7 @@ Versionamento semântico: MAJOR.MINOR.PATCH.
 
 ### Adicionado
 - Condição de vitória: controlar os 5 territórios encerra a partida com a tela "👑 VITÓRIA"
+- Derrota por falência prolongada: 60s seguidos insolvente (renda líquida ≤ 0 e dinheiro abaixo do esquema mais barato), com avisos no registro
 - Esquemas geram respeito passivo (`baseRespect`), tornando Contrabando e Cassino alcançáveis
 
 ### Corrigido

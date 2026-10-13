@@ -75,7 +75,7 @@ Suborne a polícia quando o calor passar de 60
 Pague sua família para manter a lealdade alta
 
 Vitória: controlar todos os 5 territórios.
-Derrota: calor = 100, lealdade = 0, ou falência prolongada.
+Derrota: calor = 100, lealdade = 0, ou falência prolongada (60s sem renda líquida e sem dinheiro para comprar nenhum esquema).
 
 🛠️ Stack
 TypeScript (strict)

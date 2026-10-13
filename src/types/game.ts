@@ -66,7 +66,8 @@ export interface GameState {
   crewInBattle: number;    // capangas comprometidos em batalha
   gameOver: boolean;
   gameOverReason?: string;
-  won?: boolean;           // true quando o fim de jogo foi por vitória
+  won?: boolean;
+  insolventSeconds?: number; // tempo seguido sem renda nem dinheiro para investir           // true quando o fim de jogo foi por vitória
   lastTick: number;
   log: string[];           // histórico de eventos
 }

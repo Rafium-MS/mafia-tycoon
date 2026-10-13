@@ -4,7 +4,7 @@ import { bus } from '../core/EventBus';
 
 const CREW_COST_BASE = 500;
 const CREW_COST_MULTIPLIER = 1.8;
-const CREW_UPKEEP_PER_SEC = 0.5; // cada capanga custa $0.5/s
+export const CREW_UPKEEP_PER_SEC = 0.5; // cada capanga custa $0.5/s
 
 export function getCrewRecruitCost(state: GameState): number {
   return Math.floor(CREW_COST_BASE * Math.pow(CREW_COST_MULTIPLIER, state.crew));
