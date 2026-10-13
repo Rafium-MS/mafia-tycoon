@@ -1,0 +1,30 @@
+/* src/ui/styles.css */
+body { font-family: 'Courier New', monospace; background: #0d0d0d; color: #e0e0e0; margin: 0; padding: 20px; }
+#app { max-width: 800px; margin: 0 auto; }
+h1 { color: #b8232b; text-shadow: 0 0 10px #b8232b; }
+h2 { color: #d4a574; margin-top: 28px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+.stat { background: #1a1a1a; padding: 12px; border-radius: 6px; border-left: 3px solid #b8232b; }
+.stat .label { font-size: 0.75em; color: #888; text-transform: uppercase; }
+.stat .value { font-size: 1.4em; font-weight: bold; color: #d4a574; }
+.heat-container { background: #1a1a1a; height: 20px; border-radius: 10px; overflow: hidden; margin: 15px 0; }
+#heat-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #4a8b2c, #d4a574, #b8232b); transition: width 0.3s; }
+.biz { display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 12px; margin: 8px 0; border-radius: 6px; }
+.biz.locked { opacity: 0.4; }
+.biz .desc, .desc { font-size: 0.8em; color: #888; margin-top: 4px; }
+button { background: #b8232b; color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-family: inherit; font-weight: bold; }
+button:hover:not(:disabled) { background: #d42d36; }
+button:focus-visible { outline: 2px solid #d4a574; outline-offset: 2px; }
+button:disabled { background: #333; cursor: not-allowed; opacity: 0.5; }
+.actions { margin: 20px 0; display: flex; gap: 10px; align-items: center; }
+
+.territory { background: #1a1a1a; padding: 12px; margin: 8px 0; border-radius: 6px; }
+.terr-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.owner { font-weight: bold; font-size: 0.85em; }
+.bonus { color: #7ec850; font-size: 0.85em; margin: 4px 0; }
+.defense { color: #888; font-size: 0.8em; }
+.battle { color: #b8232b; font-weight: bold; animation: pulse 1s infinite; }
+.battle-row { background: #2a0a0a; padding: 10px; margin: 5px 0; border-radius: 4px; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.log-entry { font-size: 0.85em; color: #aaa; padding: 3px 0; border-bottom: 1px solid #1a1a1a; }

@@ -1,21 +1,24 @@
-// src/core/GameLoop.ts (atualizar)
-
+// src/core/GameLoop.ts
 import type { GameState } from '../types/game';
 import { tickEconomy } from '../systems/EconomySystem';
 import { tickHeat } from '../systems/HeatSystem';
 import { tickLoyalty } from '../systems/LoyaltySystem';
 import { tickBattles } from '../systems/BattleSystem';
-import { tickRivals } from '../systems/RivalSystem';
+import { tickRivals, getPassiveHeatReduction } from '../systems/RivalSystem';
 import { tickCrewUpkeep } from '../systems/CrewSystem';
-import { getPassiveHeatReduction } from '../systems/RivalSystem';
 
 export class GameLoop {
   private accumulator = 0;
   private readonly TICK_RATE = 1 / 10;
   private lastTime = 0;
   private rafId = 0;
+  private state: GameState;
+  private onTick: () => void;
 
-  constructor(private state: GameState, private onTick: () => void) {}
+  constructor(state: GameState, onTick: () => void) {
+    this.state = state;
+    this.onTick = onTick;
+  }
 
   start(): void {
     this.lastTime = performance.now();
@@ -42,6 +45,9 @@ export class GameLoop {
 
   private tick(dt: number): void {
     if (this.state.gameOver) return;
+
+    // Atualiza o tempo de vida do estado para persistência
+    this.state.lastTick = performance.now();
 
     tickEconomy(this.state, dt);
     tickHeat(this.state, dt);

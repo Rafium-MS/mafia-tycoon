@@ -29,9 +29,8 @@ export function createInitialState(): GameState {
     territories,
     factions,
     activeBattles: [],
-    crew: 0,
+    crew: 1,               // um capanga inicial para permitir o primeiro ataque
     crewInBattle: 0,
-    territory: [],
     gameOver: false,
     lastTick: performance.now(),
     log: [],
