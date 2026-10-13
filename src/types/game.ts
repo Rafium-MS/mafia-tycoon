@@ -11,6 +11,7 @@ export interface Business {
   baseCost: number;
   baseIncome: number;      // R$ por segundo por unidade
   baseHeat: number;        // calor por segundo por unidade
+  baseRespect: number;     // respeito por segundo por unidade
   count: number;           // quantos você possui
   unlocked: boolean;
   requiresRespect: number; // respeito mínimo para desbloquear

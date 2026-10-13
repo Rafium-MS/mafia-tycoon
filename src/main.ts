@@ -1,6 +1,7 @@
 // src/main.ts
 import './ui/styles.css';
 import { createInitialState } from './core/GameState';
+import { BUSINESS_DEFS } from './data/businesses';
 import { GameLoop } from './core/GameLoop';
 import { bus } from './core/EventBus';
 import { buyBusiness } from './systems/EconomySystem';
@@ -61,13 +62,14 @@ bus.on('log', ({ message }) => {
   if (state.log.length > LOG_LIMIT) state.log.shift();
 });
 
-bus.on('gameover', () => {
-  saveGame();
-});
-
 // ---------- Persistência ----------
 function saveGame(): void {
   try {
+    // Partida encerrada não deve ser persistida (senão "Recomeçar" volta ao fim de jogo)
+    if (state.gameOver) {
+      localStorage.removeItem(SAVE_KEY);
+      return;
+    }
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   } catch {
     /* armazenamento indisponível — segue sem salvar */
@@ -81,6 +83,17 @@ function loadGame(): GameState | null {
     const parsed = JSON.parse(raw) as GameState;
     // Sanidade mínima: só carrega saves com a estrutura esperada
     if (typeof parsed.money !== 'number' || !parsed.businesses || !parsed.territories) return null;
+    if (parsed.gameOver) return null;
+    // Reaplica os números estáticos dos esquemas: saves antigos não têm campos novos
+    // (ex.: baseRespect) e ajustes de balanceamento passam a valer para eles.
+    for (const [id, def] of Object.entries(BUSINESS_DEFS)) {
+      const saved = parsed.businesses[id as BusinessId];
+      parsed.businesses[id as BusinessId] = {
+        ...def,
+        count: saved?.count ?? 0,
+        unlocked: saved?.unlocked ?? def.requiresRespect === 0,
+      };
+    }
     parsed.lastTick = performance.now();
     return parsed;
   } catch {
@@ -93,8 +106,9 @@ window.addEventListener('beforeunload', saveGame);
 
 // ---------- Eventos de UI (delegação única) ----------
 document.addEventListener('click', (e) => {
-  const target = e.target as HTMLElement;
-  if (target.tagName !== 'BUTTON') return;
+  // closest() cobre cliques em elementos internos do botão (ex.: #recruit-cost)
+  const target = (e.target as HTMLElement).closest('button');
+  if (!target || target.disabled) return;
 
   if (target.dataset.id) {
     buyBusiness(state, target.dataset.id as BusinessId);

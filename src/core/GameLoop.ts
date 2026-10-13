@@ -12,6 +12,7 @@ export class GameLoop {
   private readonly TICK_RATE = 1 / 10;
   private lastTime = 0;
   private rafId = 0;
+  private running = false;
   private state: GameState;
   private onTick: () => void;
 
@@ -21,11 +22,13 @@ export class GameLoop {
   }
 
   start(): void {
+    this.running = true;
     this.lastTime = performance.now();
     this.loop(this.lastTime);
   }
 
   stop(): void {
+    this.running = false;
     cancelAnimationFrame(this.rafId);
   }
 
@@ -40,6 +43,8 @@ export class GameLoop {
     }
 
     this.onTick();
+    // onTick pode ter chamado stop() — não agenda o próximo frame nesse caso
+    if (!this.running) return;
     this.rafId = requestAnimationFrame(this.loop);
   };
 

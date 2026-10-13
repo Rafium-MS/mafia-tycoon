@@ -9,6 +9,7 @@ export const BUSINESS_DEFS: Record<BusinessId, Omit<Business, 'count' | 'unlocke
     baseCost: 15,
     baseIncome: 1,
     baseHeat: 0.2,
+    baseRespect: 0.005,
     requiresRespect: 0,
   },
   protection: {
@@ -18,6 +19,7 @@ export const BUSINESS_DEFS: Record<BusinessId, Omit<Business, 'count' | 'unlocke
     baseCost: 100,
     baseIncome: 8,
     baseHeat: 0.8,
+    baseRespect: 0.02,
     requiresRespect: 10,
   },
   numbers: {
@@ -27,6 +29,7 @@ export const BUSINESS_DEFS: Record<BusinessId, Omit<Business, 'count' | 'unlocke
     baseCost: 800,
     baseIncome: 50,
     baseHeat: 3,
+    baseRespect: 0.1,
     requiresRespect: 50,
   },
   smuggling: {
@@ -36,6 +39,7 @@ export const BUSINESS_DEFS: Record<BusinessId, Omit<Business, 'count' | 'unlocke
     baseCost: 5000,
     baseIncome: 300,
     baseHeat: 8,
+    baseRespect: 0.4,
     requiresRespect: 200,
   },
   casino: {
@@ -45,6 +49,7 @@ export const BUSINESS_DEFS: Record<BusinessId, Omit<Business, 'count' | 'unlocke
     baseCost: 50000,
     baseIncome: 2500,
     baseHeat: 15,
+    baseRespect: 1,
     requiresRespect: 1000,
   },
 };

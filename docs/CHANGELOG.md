@@ -3,6 +3,19 @@
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 Versionamento semântico: MAJOR.MINOR.PATCH.
 
+## [0.3.1] — 2026-10-13
+
+### Adicionado
+- Esquemas geram respeito passivo (`baseRespect`), tornando Contrabando e Cassino alcançáveis
+
+### Corrigido
+- "Recomeçar" voltava sempre à tela de fim de jogo (o save da partida encerrada era regravado no `beforeunload`)
+- `GameLoop.stop()` não interrompia o loop quando chamado de dentro do `onTick`
+- Cliques em "Comprar" se perdiam porque os botões eram recriados a cada frame
+- Clique no custo dentro do botão "Recrutar" era ignorado
+- Capangas ficavam presos em `crewInBattle` para sempre após o primeiro ataque
+- Saves antigos recebem os campos novos dos esquemas ao carregar
+
 ## [0.3.0] — 2026-10-13
 
 ### Adicionado

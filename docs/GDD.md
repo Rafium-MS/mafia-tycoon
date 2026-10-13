@@ -60,7 +60,7 @@ Tycoon clássico é "números sobem". Aqui, **números sobem com risco**:
 | Recurso | Tipo | Fonte | Uso |
 |---|---|---|---|
 | **Dinheiro** | Acumulativo | Esquemas | Comprar tudo |
-| **Respeito** | Progressivo | Conquistas, conquista de territórios | Desbloqueia esquemas |
+| **Respeito** | Progressivo | Esquemas ativos, conquista de territórios | Desbloqueia esquemas |
 | **Calor** | 0-100 | Esquemas ativos | Se chega a 100 = derrota |
 | **Lealdade** | 0-100 | Pagar crew | Se chega a 0 = derrota |
 | **Capangas** | Inteiro | Recrutamento | Poder militar + redução de calor |
@@ -68,6 +68,7 @@ Tycoon clássico é "números sobem". Aqui, **números sobem com risco**:
 ### 3.1 Fórmulas
 - **Renda por segundo** = `Σ (baseIncome × count × territoryMultiplier)`
 - **Calor por segundo** = `Σ (baseHeat × count × 0.05) - decay - crewCooling + bônusTerritórios`
+- **Respeito por segundo** = `Σ (baseRespect × count)`
 - **Ataque do jogador** = `(crew - crewEmBatalha) × 2 + floor(respeito / 10)`
 - **Custo de esquema N** = `baseCost × 1.15^count`
 - **Custo de capanga N** = `500 × 1.8^crew`
@@ -76,13 +77,13 @@ Tycoon clássico é "números sobem". Aqui, **números sobem com risco**:
 
 ## 4. Esquemas (Businesses)
 
-| ID | Nome | Custo Base | Renda/s | Calor/s | Respeito p/ Desbloquear |
-|---|---|---|---|---|---|
-| `loan_shark` | Agiotagem | 15 | 1 | 0.2 | 0 |
-| `protection` | Esquema de Proteção | 100 | 8 | 0.8 | 10 |
-| `numbers` | Jogo do Bicho | 800 | 50 | 3 | 50 |
-| `smuggling` | Contrabando | 5000 | 300 | 8 | 200 |
-| `casino` | Cassino Clandestino | 50000 | 2500 | 15 | 1000 |
+| ID | Nome | Custo Base | Renda/s | Calor/s | Respeito/s | Respeito p/ Desbloquear |
+|---|---|---|---|---|---|---|
+| `loan_shark` | Agiotagem | 15 | 1 | 0.2 | 0.005 | 0 |
+| `protection` | Esquema de Proteção | 100 | 8 | 0.8 | 0.02 | 10 |
+| `numbers` | Jogo do Bicho | 800 | 50 | 3 | 0.1 | 50 |
+| `smuggling` | Contrabando | 5000 | 300 | 8 | 0.4 | 200 |
+| `casino` | Cassino Clandestino | 50000 | 2500 | 15 | 1 | 1000 |
 
 **Filosofia:** cada esquema é ~7x mais lucrativo que o anterior, mas
 gera calor proporcionalmente maior. Escalar exige **mais subornos**.

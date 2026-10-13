@@ -66,7 +66,6 @@ export function tickBattles(state: GameState, deltaSec: number): void {
 
     // Território já mudou de dono — batalha obsoleta
     if (territory.owner !== battle.defender) {
-      if (battle.attacker === 'player') releasePlayerCrew(state);
       mapChanged = true;
       continue;
     }
@@ -101,7 +100,6 @@ export function tickBattles(state: GameState, deltaSec: number): void {
       territory.defense = 30; // re-fortifica após conquista
 
       if (battle.attacker === 'player') {
-        releasePlayerCrew(state);
         state.respect += 25;
         const prevName = state.factions[previousOwner].name;
         bus.emit('log', { message: `🏆 Você tomou ${territory.name} de ${prevName}!` });
@@ -122,6 +120,8 @@ export function tickBattles(state: GameState, deltaSec: number): void {
   }
 
   state.activeBattles = remaining;
+  // Só depois de atualizar a lista dá para saber se o jogador ainda luta
+  releasePlayerCrew(state);
 
   // Notifica o mapa que algo relevante mudou (donos/defesas/batalhas)
   if (mapChanged) {

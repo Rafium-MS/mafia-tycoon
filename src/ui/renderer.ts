@@ -10,6 +10,17 @@ const $ = (id: string): HTMLElement => {
   return el;
 };
 
+// Último HTML aplicado por elemento. Recriar botões a cada frame faz o navegador
+// perder cliques (mousedown e mouseup caem em elementos diferentes).
+const lastHtml = new WeakMap<HTMLElement, string>();
+
+/** Atribui innerHTML apenas quando o conteúdo mudou. */
+function setHTML(el: HTMLElement, html: string): void {
+  if (lastHtml.get(el) === html) return;
+  el.innerHTML = html;
+  lastHtml.set(el, html);
+}
+
 /** Números de balanceamento expostos na UI. */
 export const BRIBE_COST = 200;
 export const BRIBE_HEAT_REDUCTION = 20;
@@ -40,15 +51,14 @@ export function renderBusinesses(state: GameState): void {
       <div class="biz">
         <div>
           <strong>${b.name}</strong> x${b.count}
-          <div class="desc">${b.description} • +R$${b.baseIncome}/s • 🔥+${b.baseHeat}/s</div>
+          <div class="desc">${b.description} • +R$${b.baseIncome}/s • 🔥+${b.baseHeat}/s • ⭐+${b.baseRespect}/s</div>
         </div>
         <button data-id="${id}" ${canBuy ? '' : 'disabled'}>Comprar (R$ ${cost})</button>
       </div>
     `);
   }
 
-  // Uma única atribuição de innerHTML evita reflow por item
-  list.innerHTML = fragments.join('');
+  setHTML(list, fragments.join(''));
 
   ($('bribe') as HTMLButtonElement).textContent = `💸 Subornar Polícia (-${BRIBE_HEAT_REDUCTION} calor) — R$ ${BRIBE_COST}`;
   ($('pay') as HTMLButtonElement).textContent = `🤝 Pagar Família (+10 lealdade) — R$ ${PAY_CREW_COST}`;
@@ -86,7 +96,7 @@ export function renderTerritories(state: GameState): void {
     `);
   }
 
-  container.innerHTML = fragments.join('');
+  setHTML(container, fragments.join(''));
 }
 
 /** Renderiza a seção de capangas. */
@@ -101,26 +111,26 @@ export function renderCrew(state: GameState): void {
 export function renderBattles(state: GameState): void {
   const container = $('battles');
   if (state.activeBattles.length === 0) {
-    container.innerHTML = '<div class="desc">Nenhuma batalha em andamento.</div>';
+    setHTML(container, '<div class="desc">Nenhuma batalha em andamento.</div>');
     return;
   }
-  container.innerHTML = state.activeBattles.map(b => {
+  setHTML(container, state.activeBattles.map(b => {
     const t = state.territories[b.territoryId];
     const attacker = state.factions[b.attacker];
     const defender = state.factions[b.defender];
     return `<div class="battle-row">
       ${attacker.name} ⚔️ ${defender.name} — ${t.name} • Defesa restante: ${t.defense.toFixed(0)}
     </div>`;
-  }).join('');
+  }).join(''));
 }
 
 /** Renderiza o log de eventos (últimos 8). */
 export function renderLog(state: GameState): void {
   const container = $('log');
   const recent = state.log.slice(-8).reverse();
-  container.innerHTML = recent.length
+  setHTML(container, recent.length
     ? recent.map(m => `<div class="log-entry">${m}</div>`).join('')
-    : '<div class="desc">Sem novidades… por enquanto.</div>';
+    : '<div class="desc">Sem novidades… por enquanto.</div>');
 }
 
 /** Tela de fim de jogo. */
