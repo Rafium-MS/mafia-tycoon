@@ -1,0 +1,28 @@
+
+## Ordem de Execução (por tick)
+
+1. `tickEconomy` — adiciona dinheiro
+2. `tickHeat` — recalcula calor
+3. `tickLoyalty` — recalcula lealdade
+4. `tickCrewUpkeep` — deduz salário dos capangas
+5. `tickBattles` — resolve batalhas ativas
+6. `tickRivals` — IA das facções
+7. Aplicar redução passiva de calor (bônus de territórios)
+8. Checar condições de derrota
+
+Ordem importa: batalhas antes de IA, porque a IA pode atacar um
+território que acabou de ser conquistado.
+
+## Convenções de Código
+
+- **Nomes de arquivo:** `PascalCase.ts` para classes/módulos, `camelCase.ts` para utilitários
+- **Exports:** nomeados (evitar `default` exceto onde faz sentido)
+- **Tipos:** prefixo `I` não é usado; apenas nomes diretos (`GameState`, `Battle`)
+- **Imutabilidade:** preferimos mutar o `GameState` central (performance + simplicidade)
+- **Funções puras** quando possível (ex: `getCost`, `canAttack`)
+
+## Performance
+
+- Loop a 10 Hz para lógica; render a 60 Hz via `requestAnimationFrame`
+- Mapa SVG re-renderizado a cada frame (custo baixo, ~7 elementos)
+- Se escalar (mais territórios), migrar para renderização só em mudança via `map:dirty`
