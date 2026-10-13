@@ -1,0 +1,56 @@
+// src/core/GameLoop.ts (atualizar)
+
+import type { GameState } from '../types/game';
+import { tickEconomy } from '../systems/EconomySystem';
+import { tickHeat } from '../systems/HeatSystem';
+import { tickLoyalty } from '../systems/LoyaltySystem';
+import { tickBattles } from '../systems/BattleSystem';
+import { tickRivals } from '../systems/RivalSystem';
+import { tickCrewUpkeep } from '../systems/CrewSystem';
+import { getPassiveHeatReduction } from '../systems/RivalSystem';
+
+export class GameLoop {
+  private accumulator = 0;
+  private readonly TICK_RATE = 1 / 10;
+  private lastTime = 0;
+  private rafId = 0;
+
+  constructor(private state: GameState, private onTick: () => void) {}
+
+  start(): void {
+    this.lastTime = performance.now();
+    this.loop(this.lastTime);
+  }
+
+  stop(): void {
+    cancelAnimationFrame(this.rafId);
+  }
+
+  private loop = (now: number): void => {
+    const deltaSec = Math.min((now - this.lastTime) / 1000, 0.25);
+    this.lastTime = now;
+    this.accumulator += deltaSec;
+
+    while (this.accumulator >= this.TICK_RATE) {
+      this.tick(this.TICK_RATE);
+      this.accumulator -= this.TICK_RATE;
+    }
+
+    this.onTick();
+    this.rafId = requestAnimationFrame(this.loop);
+  };
+
+  private tick(dt: number): void {
+    if (this.state.gameOver) return;
+
+    tickEconomy(this.state, dt);
+    tickHeat(this.state, dt);
+    tickLoyalty(this.state, dt);
+    tickCrewUpkeep(this.state, dt);
+    tickBattles(this.state, dt);
+    tickRivals(this.state, dt);
+
+    // Bônus passivo: territórios controlados reduzem calor
+    this.state.heat = Math.max(0, this.state.heat - getPassiveHeatReduction(this.state) * dt);
+  }
+}
