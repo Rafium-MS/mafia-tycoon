@@ -105,7 +105,8 @@ export function tickBattles(state: GameState, deltaSec: number): void {
         bus.emit('log', { message: `🏆 Você tomou ${territory.name} de ${prevName}!` });
         // Facção derrotada fica ciente do jogador e quer retomar
         state.factions[previousOwner].awareOfPlayer = true;
-      } else {
+      } else if (previousOwner === 'player') {
+        // Só penaliza quando o território perdido era do jogador (rival x rival não afeta)
         const attackerName = state.factions[battle.attacker].name;
         bus.emit('log', { message: `💥 Você perdeu ${territory.name} para ${attackerName}!` });
         // Perder território derruba respeito e lealdade

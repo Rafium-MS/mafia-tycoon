@@ -17,6 +17,7 @@ Versionamento semântico: MAJOR.MINOR.PATCH.
 - Clique no custo dentro do botão "Recrutar" era ignorado
 - Capangas ficavam presos em `crewInBattle` para sempre após o primeiro ataque
 - Saves antigos recebem os campos novos dos esquemas ao carregar
+- Conquista entre facções rivais mostrava "Você perdeu…" e tirava respeito e lealdade do jogador
 
 ## [0.3.0] — 2026-10-13
 
