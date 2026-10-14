@@ -130,7 +130,8 @@ Little Italy ── Downtown ── Chinatown
 | Polícia | Azul-escuro `#2c5aa0` | 20 | 0 | Nunca ataca, só defende |
 
 ### 6.1 IA
-- Facções ganham **+aggression × 2 de poder** a cada 5 segundos
+- Facções ganham **+aggression × 2 de poder** a cada 5 segundos, até o teto de **2× o poder inicial** (Marcone 60, Tong 90, Bratva 140)
+- Facções sem nenhum território param de crescer
 - A cada 5s, cada facção tem **chance `aggression × 0.3`** de agir
 - Se **não ciente** do jogador: ataca outras facções
 - Se **ciente** (após perder território pro jogador): prioriza atacar territórios vizinhos do jogador
