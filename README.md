@@ -21,6 +21,8 @@ npm run preview  # servir o build
 npm test         # testes dos sistemas (Vitest)
 ```
 
+O GitHub Actions (`.github/workflows/ci.yml`) roda `npm test` e `npm run build` em cada pull request e em cada push na `main`.
+
 ## Arquitetura
 
 ```
