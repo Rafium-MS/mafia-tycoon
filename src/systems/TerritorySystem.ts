@@ -1,10 +1,38 @@
 // src/systems/TerritorySystem.ts
 import type { GameState, TerritoryId, BusinessId } from '../types/game';
 import { bus } from '../core/EventBus';
+import { TERRITORY_DEFS } from '../data/territories';
 
 /** Constante de balanceamento: desconto por vizinho aliado ao cercar o alvo. */
 const SIEGE_DISCOUNT_PER_NEIGHBOR = 0.1;
 const MIN_CONQUEST_COST = 100; // clamp: custo nunca fica irrisório
+
+/** Defesa de um território logo após trocar de dono. */
+export const CONQUERED_DEFENSE = 30;
+/** Tempo (s) para a defesa ir de 0 ao máximo fora de batalha. */
+const DEFENSE_REGEN_FULL_SEC = 30;
+
+/** Defesa máxima: a original do território, nunca abaixo da defesa pós-conquista. */
+export function getMaxDefense(id: TerritoryId): number {
+  return Math.max(TERRITORY_DEFS[id].defense, CONQUERED_DEFENSE);
+}
+
+/**
+ * Territórios fora de batalha recuperam defesa aos poucos até o máximo.
+ * Só avisa o mapa quando o valor exibido (arredondado) muda.
+ */
+export function tickTerritoryDefense(state: GameState, deltaSec: number): void {
+  let changed = false;
+  for (const t of Object.values(state.territories)) {
+    if (state.activeBattles.some(b => b.territoryId === t.id)) continue;
+    const max = getMaxDefense(t.id);
+    if (t.defense >= max) continue;
+    const before = Math.round(t.defense);
+    t.defense = Math.min(max, t.defense + (max / DEFENSE_REGEN_FULL_SEC) * deltaSec);
+    if (Math.round(t.defense) !== before) changed = true;
+  }
+  if (changed) bus.emit('map:dirty', {});
+}
 
 /**
  * Calcula o multiplicador total para um negócio baseado nos territórios controlados.

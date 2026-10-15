@@ -1,7 +1,7 @@
 // src/systems/BattleSystem.ts
 import type { GameState, TerritoryId, Battle } from '../types/game';
 import { bus } from '../core/EventBus';
-import { getPlayerAttackPower, getConquestCost } from './TerritorySystem';
+import { getPlayerAttackPower, getConquestCost, CONQUERED_DEFENSE } from './TerritorySystem';
 
 const BATTLE_TICK_INTERVAL = 2;      // batalhas resolvem a cada 2s
 const CREW_LOSS_CHANCE = 0.15;       // chance de perder 1 capanga por resolução
@@ -97,7 +97,7 @@ export function tickBattles(state: GameState, deltaSec: number): void {
     if (territory.defense <= 0) {
       const previousOwner = territory.owner;
       territory.owner = battle.attacker;
-      territory.defense = 30; // re-fortifica após conquista
+      territory.defense = CONQUERED_DEFENSE; // re-fortifica após conquista
 
       if (battle.attacker === 'player') {
         state.respect += 25;

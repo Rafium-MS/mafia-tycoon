@@ -6,7 +6,7 @@ import { tickLoyalty } from '../systems/LoyaltySystem';
 import { tickBattles } from '../systems/BattleSystem';
 import { tickRivals, getPassiveHeatReduction } from '../systems/RivalSystem';
 import { tickCrewUpkeep } from '../systems/CrewSystem';
-import { checkVictory } from '../systems/TerritorySystem';
+import { checkVictory, tickTerritoryDefense } from '../systems/TerritorySystem';
 
 export class GameLoop {
   private accumulator = 0;
@@ -61,6 +61,7 @@ export class GameLoop {
     tickCrewUpkeep(this.state, dt);
     tickBankruptcy(this.state, dt);
     tickBattles(this.state, dt);
+    tickTerritoryDefense(this.state, dt);
     tickRivals(this.state, dt);
 
     // Bônus passivo: territórios controlados reduzem calor

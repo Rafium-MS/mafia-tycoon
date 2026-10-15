@@ -116,6 +116,7 @@ Little Italy ── Downtown ── Chinatown
 - Durante batalhas, há **15% de chance de perder um capanga** por tick
 - Conquistar território dá **+25 de respeito**
 - Cada território controlado reduz **calor passivo em 0.1/s**
+- Fora de batalha, a defesa se **recupera sozinha** até o máximo do território (a defesa original, no mínimo 30) em **30 segundos**; conquistar deixa a defesa em 30
 
 ---
 
