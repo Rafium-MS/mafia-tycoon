@@ -1,0 +1,5 @@
+dist
+node_modules
+package-lock.json
+# Documentação em prosa: tabelas e diagramas em texto ficam como estão
+*.md

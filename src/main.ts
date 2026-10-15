@@ -28,7 +28,7 @@ import {
 const SAVE_KEY = 'mafia-tycoon-save';
 const LOG_LIMIT = 50;
 
-let state: GameState = loadGame() ?? createInitialState();
+const state: GameState = loadGame() ?? createInitialState();
 const loop = new GameLoop(state, render);
 
 // Cria o mapa UMA VEZ (ele se auto-renderiza)
