@@ -3,6 +3,26 @@
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 Versionamento semântico: MAJOR.MINOR.PATCH.
 
+## [0.3.1] — 2026-10-13
+
+### Adicionado
+- Condição de vitória: controlar os 5 territórios encerra a partida com a tela "👑 VITÓRIA"
+- Derrota por falência prolongada: 60s seguidos insolvente (renda líquida ≤ 0 e dinheiro abaixo do esquema mais barato), com avisos no registro
+- Reforço de defesa: botão por território do jogador (+20 por R$ 100 + 10 × defesa atual, até 3× o máximo), também durante batalhas; o mapa passa a mostrar a defesa dos territórios do jogador
+- Defesa dos territórios se recupera fora de batalha: do zero ao máximo (defesa original, mínimo 30) em 30s
+- Teto de poder das facções rivais: crescem até 2× o poder inicial e param de crescer sem território
+- Esquemas geram respeito passivo (`baseRespect`), tornando Contrabando e Cassino alcançáveis
+
+### Corrigido
+- "Recomeçar" voltava sempre à tela de fim de jogo (o save da partida encerrada era regravado no `beforeunload`)
+- `GameLoop.stop()` não interrompia o loop quando chamado de dentro do `onTick`
+- Cliques em "Comprar" se perdiam porque os botões eram recriados a cada frame
+- Clique no custo dentro do botão "Recrutar" era ignorado
+- Cliques em "Reforçar" e nos territórios do mapa se perdiam quando a recuperação de defesa redesenhava a tela entre pressionar e soltar o botão do mouse
+- Capangas ficavam presos em `crewInBattle` para sempre após o primeiro ataque
+- Saves antigos recebem os campos novos dos esquemas ao carregar
+- Conquista entre facções rivais mostrava "Você perdeu…" e tirava respeito e lealdade do jogador
+
 ## [0.3.0] — 2026-10-13
 
 ### Adicionado

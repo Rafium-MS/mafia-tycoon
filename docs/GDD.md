@@ -51,7 +51,7 @@ Tycoon clássico é "números sobem". Aqui, **números sobem com risco**:
 **Tick:** 10 vezes por segundo (0.1s).
 **Sessão alvo:** 15-30 minutos por partida.
 **Vitória:** controlar todos os 5 territórios.
-**Derrota:** calor = 100, lealdade = 0, ou dinheiro = 0 por muito tempo.
+**Derrota:** calor = 100, lealdade = 0, ou falência prolongada: 60s seguidos com renda líquida ≤ 0 e dinheiro abaixo do esquema mais barato.
 
 ---
 
@@ -60,7 +60,7 @@ Tycoon clássico é "números sobem". Aqui, **números sobem com risco**:
 | Recurso | Tipo | Fonte | Uso |
 |---|---|---|---|
 | **Dinheiro** | Acumulativo | Esquemas | Comprar tudo |
-| **Respeito** | Progressivo | Conquistas, conquista de territórios | Desbloqueia esquemas |
+| **Respeito** | Progressivo | Esquemas ativos, conquista de territórios | Desbloqueia esquemas |
 | **Calor** | 0-100 | Esquemas ativos | Se chega a 100 = derrota |
 | **Lealdade** | 0-100 | Pagar crew | Se chega a 0 = derrota |
 | **Capangas** | Inteiro | Recrutamento | Poder militar + redução de calor |
@@ -68,6 +68,7 @@ Tycoon clássico é "números sobem". Aqui, **números sobem com risco**:
 ### 3.1 Fórmulas
 - **Renda por segundo** = `Σ (baseIncome × count × territoryMultiplier)`
 - **Calor por segundo** = `Σ (baseHeat × count × 0.05) - decay - crewCooling + bônusTerritórios`
+- **Respeito por segundo** = `Σ (baseRespect × count)`
 - **Ataque do jogador** = `(crew - crewEmBatalha) × 2 + floor(respeito / 10)`
 - **Custo de esquema N** = `baseCost × 1.15^count`
 - **Custo de capanga N** = `500 × 1.8^crew`
@@ -76,13 +77,13 @@ Tycoon clássico é "números sobem". Aqui, **números sobem com risco**:
 
 ## 4. Esquemas (Businesses)
 
-| ID | Nome | Custo Base | Renda/s | Calor/s | Respeito p/ Desbloquear |
-|---|---|---|---|---|---|
-| `loan_shark` | Agiotagem | 15 | 1 | 0.2 | 0 |
-| `protection` | Esquema de Proteção | 100 | 8 | 0.8 | 10 |
-| `numbers` | Jogo do Bicho | 800 | 50 | 3 | 50 |
-| `smuggling` | Contrabando | 5000 | 300 | 8 | 200 |
-| `casino` | Cassino Clandestino | 50000 | 2500 | 15 | 1000 |
+| ID | Nome | Custo Base | Renda/s | Calor/s | Respeito/s | Respeito p/ Desbloquear |
+|---|---|---|---|---|---|---|
+| `loan_shark` | Agiotagem | 15 | 1 | 0.2 | 0.005 | 0 |
+| `protection` | Esquema de Proteção | 100 | 8 | 0.8 | 0.02 | 10 |
+| `numbers` | Jogo do Bicho | 800 | 50 | 3 | 0.1 | 50 |
+| `smuggling` | Contrabando | 5000 | 300 | 8 | 0.4 | 200 |
+| `casino` | Cassino Clandestino | 50000 | 2500 | 15 | 1 | 1000 |
 
 **Filosofia:** cada esquema é ~7x mais lucrativo que o anterior, mas
 gera calor proporcionalmente maior. Escalar exige **mais subornos**.
@@ -115,6 +116,8 @@ Little Italy ── Downtown ── Chinatown
 - Durante batalhas, há **15% de chance de perder um capanga** por tick
 - Conquistar território dá **+25 de respeito**
 - Cada território controlado reduz **calor passivo em 0.1/s**
+- O jogador pode **reforçar** a defesa dos próprios territórios, inclusive em batalha: **+20** por `100 + 10 × defesa atual` em dinheiro, até **3× o máximo** do território
+- Fora de batalha, a defesa se **recupera sozinha** até o máximo do território (a defesa original, no mínimo 30) em **30 segundos**; conquistar deixa a defesa em 30
 
 ---
 
@@ -129,7 +132,8 @@ Little Italy ── Downtown ── Chinatown
 | Polícia | Azul-escuro `#2c5aa0` | 20 | 0 | Nunca ataca, só defende |
 
 ### 6.1 IA
-- Facções ganham **+aggression × 2 de poder** a cada 5 segundos
+- Facções ganham **+aggression × 2 de poder** a cada 5 segundos, até o teto de **2× o poder inicial** (Marcone 60, Tong 90, Bratva 140)
+- Facções sem nenhum território param de crescer
 - A cada 5s, cada facção tem **chance `aggression × 0.3`** de agir
 - Se **não ciente** do jogador: ataca outras facções
 - Se **ciente** (após perder território pro jogador): prioriza atacar territórios vizinhos do jogador

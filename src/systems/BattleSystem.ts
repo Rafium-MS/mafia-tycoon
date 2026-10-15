@@ -1,7 +1,7 @@
 // src/systems/BattleSystem.ts
 import type { GameState, TerritoryId, Battle } from '../types/game';
 import { bus } from '../core/EventBus';
-import { getPlayerAttackPower, getConquestCost } from './TerritorySystem';
+import { getPlayerAttackPower, getConquestCost, CONQUERED_DEFENSE } from './TerritorySystem';
 
 const BATTLE_TICK_INTERVAL = 2;      // batalhas resolvem a cada 2s
 const CREW_LOSS_CHANCE = 0.15;       // chance de perder 1 capanga por resolução
@@ -66,7 +66,6 @@ export function tickBattles(state: GameState, deltaSec: number): void {
 
     // Território já mudou de dono — batalha obsoleta
     if (territory.owner !== battle.defender) {
-      if (battle.attacker === 'player') releasePlayerCrew(state);
       mapChanged = true;
       continue;
     }
@@ -98,16 +97,16 @@ export function tickBattles(state: GameState, deltaSec: number): void {
     if (territory.defense <= 0) {
       const previousOwner = territory.owner;
       territory.owner = battle.attacker;
-      territory.defense = 30; // re-fortifica após conquista
+      territory.defense = CONQUERED_DEFENSE; // re-fortifica após conquista
 
       if (battle.attacker === 'player') {
-        releasePlayerCrew(state);
         state.respect += 25;
         const prevName = state.factions[previousOwner].name;
         bus.emit('log', { message: `🏆 Você tomou ${territory.name} de ${prevName}!` });
         // Facção derrotada fica ciente do jogador e quer retomar
         state.factions[previousOwner].awareOfPlayer = true;
-      } else {
+      } else if (previousOwner === 'player') {
+        // Só penaliza quando o território perdido era do jogador (rival x rival não afeta)
         const attackerName = state.factions[battle.attacker].name;
         bus.emit('log', { message: `💥 Você perdeu ${territory.name} para ${attackerName}!` });
         // Perder território derruba respeito e lealdade
@@ -122,6 +121,8 @@ export function tickBattles(state: GameState, deltaSec: number): void {
   }
 
   state.activeBattles = remaining;
+  // Só depois de atualizar a lista dá para saber se o jogador ainda luta
+  releasePlayerCrew(state);
 
   // Notifica o mapa que algo relevante mudou (donos/defesas/batalhas)
   if (mapChanged) {

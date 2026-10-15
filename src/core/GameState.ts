@@ -32,6 +32,7 @@ export function createInitialState(): GameState {
     crew: 1,               // um capanga inicial para permitir o primeiro ataque
     crewInBattle: 0,
     gameOver: false,
+    insolventSeconds: 0,
     lastTick: performance.now(),
     log: [],
   };

@@ -1,8 +1,15 @@
 // src/systems/RivalSystem.ts
 import type { GameState, TerritoryId, FactionId, Battle } from '../types/game';
 import { bus } from '../core/EventBus';
+import { FACTION_DEFS } from '../data/territories';
 
 const RIVAL_TICK_INTERVAL = 5;   // IA age a cada 5s
+const RIVAL_POWER_CAP_MULTIPLIER = 2; // teto de poder = 2x o poder inicial da facção
+
+/** Poder máximo que uma facção pode acumular crescendo sozinha. */
+export function getFactionPowerCap(faction: FactionId): number {
+  return FACTION_DEFS[faction].power * RIVAL_POWER_CAP_MULTIPLIER;
+}
 
 // Timer da IA (fora do estado serializável)
 let rivalTimer = 0;
@@ -15,10 +22,14 @@ export function tickRivals(state: GameState, deltaSec: number): void {
   if (rivalTimer < RIVAL_TICK_INTERVAL) return;
   rivalTimer = 0;
 
-  // 1. Facções crescem
+  // 1. Facções crescem até o teto; sem território, não há de onde tirar força
   for (const faction of Object.values(state.factions)) {
     if (faction.id === 'player' || faction.id === 'police') continue;
-    faction.power += faction.aggression * 2; // cresce com o tempo
+    const cap = getFactionPowerCap(faction.id);
+    const hasTerritory = Object.values(state.territories).some(t => t.owner === faction.id);
+    if (hasTerritory) faction.power += faction.aggression * 2;
+    // O clamp também corrige saves antigos que cresceram sem limite
+    faction.power = Math.min(faction.power, cap);
   }
 
   // 2. Facções decidem atacar

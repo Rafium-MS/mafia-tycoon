@@ -1,17 +1,19 @@
 // src/core/GameLoop.ts
 import type { GameState } from '../types/game';
-import { tickEconomy } from '../systems/EconomySystem';
+import { tickEconomy, tickBankruptcy } from '../systems/EconomySystem';
 import { tickHeat } from '../systems/HeatSystem';
 import { tickLoyalty } from '../systems/LoyaltySystem';
 import { tickBattles } from '../systems/BattleSystem';
 import { tickRivals, getPassiveHeatReduction } from '../systems/RivalSystem';
 import { tickCrewUpkeep } from '../systems/CrewSystem';
+import { checkVictory, tickTerritoryDefense } from '../systems/TerritorySystem';
 
 export class GameLoop {
   private accumulator = 0;
   private readonly TICK_RATE = 1 / 10;
   private lastTime = 0;
   private rafId = 0;
+  private running = false;
   private state: GameState;
   private onTick: () => void;
 
@@ -21,11 +23,13 @@ export class GameLoop {
   }
 
   start(): void {
+    this.running = true;
     this.lastTime = performance.now();
     this.loop(this.lastTime);
   }
 
   stop(): void {
+    this.running = false;
     cancelAnimationFrame(this.rafId);
   }
 
@@ -40,6 +44,8 @@ export class GameLoop {
     }
 
     this.onTick();
+    // onTick pode ter chamado stop() — não agenda o próximo frame nesse caso
+    if (!this.running) return;
     this.rafId = requestAnimationFrame(this.loop);
   };
 
@@ -53,10 +59,15 @@ export class GameLoop {
     tickHeat(this.state, dt);
     tickLoyalty(this.state, dt);
     tickCrewUpkeep(this.state, dt);
+    tickBankruptcy(this.state, dt);
     tickBattles(this.state, dt);
+    tickTerritoryDefense(this.state, dt);
     tickRivals(this.state, dt);
 
     // Bônus passivo: territórios controlados reduzem calor
     this.state.heat = Math.max(0, this.state.heat - getPassiveHeatReduction(this.state) * dt);
+
+    // Derrota no mesmo tick tem prioridade sobre a vitória
+    if (!this.state.gameOver) checkVictory(this.state);
   }
 }

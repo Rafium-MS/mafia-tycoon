@@ -1,7 +1,7 @@
 // src/ui/MapRenderer.ts
 import type { GameState, TerritoryId } from '../types/game';
 import { TERRITORY_POSITIONS, TERRITORY_SHORT_NAMES } from '../data/territories';
-import { canAttack, getConquestCost } from '../systems/TerritorySystem';
+import { canAttack, getConquestCost, canReinforce, getReinforceCost } from '../systems/TerritorySystem';
 import { startPlayerAttack } from '../systems/BattleSystem';
 import { bus } from '../core/EventBus';
 
@@ -12,6 +12,8 @@ export class MapRenderer {
   private connectionsGroup: SVGGElement;
   private nodesGroup: SVGGElement;
   private readonly state: GameState;
+  /** Território sob o ponteiro no pointerdown (os nós são recriados a cada render). */
+  private pressedId: TerritoryId | null = null;
 
   constructor(container: HTMLElement, state: GameState) {
     this.state = state;
@@ -29,6 +31,20 @@ export class MapRenderer {
     this.svg.appendChild(this.nodesGroup);
 
     container.appendChild(this.svg);
+
+    // O mapa é redesenhado com frequência (ex.: recuperação de defesa). Um clique
+    // comum se perde se o nó for recriado entre pressionar e soltar, então o
+    // clique é reconhecido pelo território, não pelo elemento.
+    this.svg.addEventListener('pointerdown', (e) => {
+      this.pressedId = e.button === 0 ? territoryIdAt(e.target) : null;
+    });
+    this.svg.addEventListener('pointerup', (e) => {
+      const id = territoryIdAt(e.target);
+      if (e.button === 0 && id && id === this.pressedId) {
+        bus.emit('territory:click', { id });
+      }
+      this.pressedId = null;
+    });
 
     // Delegação de eventos via EventBus
     bus.on('territory:click', ({ id }) => {
@@ -128,7 +144,7 @@ export class MapRenderer {
       group.appendChild(ownerText);
 
       // Defesa (quando em batalha ou relevante)
-      if (inBattle || (!isPlayer && attackable)) {
+      if (inBattle || isPlayer || attackable) {
         const defenseText = document.createElementNS(SVG_NS, 'text');
         defenseText.setAttribute('y', '32');
         defenseText.setAttribute('text-anchor', 'middle');
@@ -154,9 +170,7 @@ export class MapRenderer {
         group.style.cursor = 'default';
       }
 
-      group.addEventListener('click', () => {
-        bus.emit('territory:click', { id: territory.id });
-      });
+      group.dataset.territory = territory.id;
 
       // Tooltip nativo do SVG
       const tooltip = document.createElementNS(SVG_NS, 'title');
@@ -181,6 +195,8 @@ export class MapRenderer {
     if (canAttack(this.state, id)) {
       const cost = getConquestCost(this.state, id);
       lines.push(`---`, `Custo de ataque: R$ ${cost}`);
+    } else if (canReinforce(this.state, id)) {
+      lines.push(`---`, `Reforço: R$ ${getReinforceCost(this.state, id)}`);
     }
     return lines.join('\n');
   }
@@ -194,4 +210,11 @@ export class MapRenderer {
     }
     startPlayerAttack(this.state, id);
   }
+}
+
+/** Id do território sob o alvo de um evento de ponteiro, se houver. */
+function territoryIdAt(target: EventTarget | null): TerritoryId | null {
+  if (!(target instanceof Element)) return null;
+  const node = target.closest<SVGGElement>('[data-territory]');
+  return (node?.dataset.territory as TerritoryId | undefined) ?? null;
 }
