@@ -3,6 +3,11 @@
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 Versionamento semântico: MAJOR.MINOR.PATCH.
 
+## [Não lançado]
+
+### Adicionado
+- Testes com Vitest para os sistemas de jogo (`npm test`): economia e falência, calor, lealdade, capangas, territórios (bônus, conquista, vitória, recuperação e reforço de defesa), batalhas e IA rival
+
 ## [0.3.1] — 2026-10-13
 
 ### Adicionado

@@ -18,6 +18,7 @@ npm install
 npm run dev      # desenvolvimento
 npm run build    # tsc + build de produção
 npm run preview  # servir o build
+npm test         # testes dos sistemas (Vitest)
 ```
 
 ## Arquitetura
@@ -54,7 +55,6 @@ src/
 - O progresso é salvo automaticamente no `localStorage` a cada 5s.
 
 ## Próximos passos sugeridos
-- Testes unitários com Vitest (cálculo de custos, resolução de batalhas).
 - ESLint + Prettier.
 - Balanceamento: curva de dificuldade da IA e economia early-game.
 - Sanitizar mensagens de log antes de injetar HTML (hoje são apenas strings internas).
