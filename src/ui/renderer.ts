@@ -99,30 +99,44 @@ export function renderTerritories(state: GameState): void {
   setHTML(container, fragments.join(''));
 }
 
-/** Renderiza os reforços de defesa dos territórios do jogador. */
+/** Atualiza texto só quando muda, sem recriar o elemento. */
+function setText(el: Element, text: string): void {
+  if (el.textContent !== text) el.textContent = text;
+}
+
+/**
+ * Renderiza os reforços de defesa dos territórios do jogador.
+ * Defesa e custo mudam várias vezes por segundo (recuperação natural), então o
+ * HTML só é refeito quando a estrutura muda; o resto é atualizado no lugar para
+ * o botão não ser recriado no meio de um clique.
+ */
 export function renderReinforce(state: GameState): void {
   const container = $('reinforce');
-  const fragments: string[] = [];
+  const owned = Object.values(state.territories).filter(t => t.owner === 'player');
 
-  for (const t of Object.values(state.territories)) {
-    if (t.owner !== 'player') continue;
-    const cap = getReinforceCap(t.id);
-    const cost = getReinforceCost(state, t.id);
-    const action = canReinforce(state, t.id)
-      ? `<button data-reinforce="${t.id}" ${state.money >= cost ? '' : 'disabled'}>Reforçar +${REINFORCE_AMOUNT} (R$ ${cost})</button>`
-      : `<span class="desc">Fortificação máxima</span>`;
-    fragments.push(`
+  const rows = owned.map(t => `
       <div class="biz">
         <div>
           <strong>${t.name}</strong>
-          <div class="desc">🛡 Defesa ${t.defense.toFixed(0)} / ${cap}</div>
+          <div class="desc">🛡 Defesa <span data-defense="${t.id}"></span> / ${getReinforceCap(t.id)}</div>
         </div>
-        ${action}
+        ${canReinforce(state, t.id)
+          ? `<button data-reinforce="${t.id}"></button>`
+          : `<span class="desc">Fortificação máxima</span>`}
       </div>
     `);
-  }
+  setHTML(container, rows.length ? rows.join('') : '<div class="desc">Você não controla nenhum território.</div>');
 
-  setHTML(container, fragments.length ? fragments.join('') : '<div class="desc">Você não controla nenhum território.</div>');
+  for (const t of owned) {
+    const defense = container.querySelector(`[data-defense="${t.id}"]`);
+    if (defense) setText(defense, t.defense.toFixed(0));
+    const button = container.querySelector<HTMLButtonElement>(`[data-reinforce="${t.id}"]`);
+    if (!button) continue;
+    const cost = getReinforceCost(state, t.id);
+    setText(button, `Reforçar +${REINFORCE_AMOUNT} (R$ ${cost})`);
+    const disabled = state.money < cost;
+    if (button.disabled !== disabled) button.disabled = disabled;
+  }
 }
 
 /** Renderiza a seção de capangas. */

@@ -18,6 +18,7 @@ Versionamento semântico: MAJOR.MINOR.PATCH.
 - `GameLoop.stop()` não interrompia o loop quando chamado de dentro do `onTick`
 - Cliques em "Comprar" se perdiam porque os botões eram recriados a cada frame
 - Clique no custo dentro do botão "Recrutar" era ignorado
+- Cliques em "Reforçar" e nos territórios do mapa se perdiam quando a recuperação de defesa redesenhava a tela entre pressionar e soltar o botão do mouse
 - Capangas ficavam presos em `crewInBattle` para sempre após o primeiro ataque
 - Saves antigos recebem os campos novos dos esquemas ao carregar
 - Conquista entre facções rivais mostrava "Você perdeu…" e tirava respeito e lealdade do jogador
