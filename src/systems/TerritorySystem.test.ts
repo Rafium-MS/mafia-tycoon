@@ -2,15 +2,36 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import type { GameState, Battle } from '../types/game';
 import { createInitialState } from '../core/GameState';
 import {
-  getBusinessMultiplier, canAttack, getPlayerAttackPower, getConquestCost, checkVictory,
-  getMaxDefense, tickTerritoryDefense, getReinforceCap, getReinforceCost, canReinforce, reinforceTerritory,
+  getBusinessMultiplier,
+  canAttack,
+  getPlayerAttackPower,
+  getConquestCost,
+  checkVictory,
+  getMaxDefense,
+  tickTerritoryDefense,
+  getReinforceCap,
+  getReinforceCost,
+  canReinforce,
+  reinforceTerritory,
 } from './TerritorySystem';
 
 let state: GameState;
-beforeEach(() => { state = createInitialState(); });
+beforeEach(() => {
+  state = createInitialState();
+});
 
-const battle = (territoryId: Battle['territoryId'], attacker: Battle['attacker'], defender: Battle['defender']): Battle =>
-  ({ territoryId, attacker, defender, attackerPower: 0, defenderPower: 0, startedAt: 0 });
+const battle = (
+  territoryId: Battle['territoryId'],
+  attacker: Battle['attacker'],
+  defender: Battle['defender'],
+): Battle => ({
+  territoryId,
+  attacker,
+  defender,
+  attackerPower: 0,
+  defenderPower: 0,
+  startedAt: 0,
+});
 
 describe('bônus e ataque', () => {
   it('multiplicador soma os bônus dos territórios do jogador', () => {

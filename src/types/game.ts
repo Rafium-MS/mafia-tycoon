@@ -9,10 +9,10 @@ export interface Business {
   name: string;
   description: string;
   baseCost: number;
-  baseIncome: number;      // R$ por segundo por unidade
-  baseHeat: number;        // calor por segundo por unidade
-  baseRespect: number;     // respeito por segundo por unidade
-  count: number;           // quantos você possui
+  baseIncome: number; // R$ por segundo por unidade
+  baseHeat: number; // calor por segundo por unidade
+  baseRespect: number; // respeito por segundo por unidade
+  count: number; // quantos você possui
   unlocked: boolean;
   requiresRespect: number; // respeito mínimo para desbloquear
 }
@@ -38,8 +38,8 @@ export interface Faction {
   id: FactionId;
   name: string;
   color: string;
-  power: number;              // força militar (usada em batalhas)
-  aggression: number;         // 0-1, quanto ataca por tick
+  power: number; // força militar (usada em batalhas)
+  aggression: number; // 0-1, quanto ataca por tick
   // IA só age se o jogador estiver "no radar" dela
   awareOfPlayer: boolean;
 }
@@ -55,21 +55,21 @@ export interface Battle {
 
 export interface GameState {
   money: number;
-  respect: number;         // desbloqueia coisas
-  heat: number;            // 0-100; ao chegar em 100 = prisão
-  loyalty: number;         // 0-100; baixa = traição
+  respect: number; // desbloqueia coisas
+  heat: number; // 0-100; ao chegar em 100 = prisão
+  loyalty: number; // 0-100; baixa = traição
   businesses: Record<BusinessId, Business>;
   territories: Record<TerritoryId, Territory>;
   factions: Record<FactionId, Faction>;
   activeBattles: Battle[];
-  crew: number;            // capangas (poder militar do jogador)
-  crewInBattle: number;    // capangas comprometidos em batalha
+  crew: number; // capangas (poder militar do jogador)
+  crewInBattle: number; // capangas comprometidos em batalha
   gameOver: boolean;
   gameOverReason?: string;
   won?: boolean;
   insolventSeconds?: number; // tempo seguido sem renda nem dinheiro para investir           // true quando o fim de jogo foi por vitória
   lastTick: number;
-  log: string[];           // histórico de eventos
+  log: string[]; // histórico de eventos
 }
 
 export interface GameEvent {

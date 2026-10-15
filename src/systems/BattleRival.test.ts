@@ -14,10 +14,16 @@ beforeEach(() => {
   state = createInitialState();
   vi.spyOn(Math, 'random').mockReturnValue(0.5); // rolagens no meio (sem variância, sem perda de capanga)
 });
-afterEach(() => { vi.restoreAllMocks(); });
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
-const rivalBattle = (territoryId: Battle['territoryId'], attacker: Battle['attacker'], defender: Battle['defender'], attackerPower: number): Battle =>
-  ({ territoryId, attacker, defender, attackerPower, defenderPower: 0, startedAt: 0 });
+const rivalBattle = (
+  territoryId: Battle['territoryId'],
+  attacker: Battle['attacker'],
+  defender: Battle['defender'],
+  attackerPower: number,
+): Battle => ({ territoryId, attacker, defender, attackerPower, defenderPower: 0, startedAt: 0 });
 
 describe('startPlayerAttack', () => {
   it('cobra o custo, cria a batalha e compromete capangas', () => {

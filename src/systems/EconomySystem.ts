@@ -5,7 +5,7 @@ import { getBusinessMultiplier } from './TerritorySystem';
 import { bus } from '../core/EventBus';
 import { CREW_UPKEEP_PER_SEC } from './CrewSystem';
 
-const BANKRUPTCY_LIMIT_SEC = 60;   // tempo insolvente até a derrota
+const BANKRUPTCY_LIMIT_SEC = 60; // tempo insolvente até a derrota
 const BANKRUPTCY_WARNING_SEC = 15; // aviso final antes da derrota
 
 export function tickEconomy(state: GameState, deltaSec: number): void {
@@ -61,7 +61,9 @@ export function getNetIncomePerSec(state: GameState): number {
  */
 export function isInsolvent(state: GameState): boolean {
   if (getNetIncomePerSec(state) > 0) return false;
-  const costs = Object.values(state.businesses).filter(b => b.unlocked).map(getCost);
+  const costs = Object.values(state.businesses)
+    .filter((b) => b.unlocked)
+    .map(getCost);
   return state.money < Math.min(...costs);
 }
 
@@ -70,7 +72,8 @@ export function tickBankruptcy(state: GameState, deltaSec: number): void {
   if (state.gameOver) return;
 
   if (!isInsolvent(state)) {
-    if ((state.insolventSeconds ?? 0) > 0) bus.emit('log', { message: `😮‍💨 As contas voltaram a fechar.` });
+    if ((state.insolventSeconds ?? 0) > 0)
+      bus.emit('log', { message: `😮‍💨 As contas voltaram a fechar.` });
     state.insolventSeconds = 0;
     return;
   }
@@ -80,8 +83,13 @@ export function tickBankruptcy(state: GameState, deltaSec: number): void {
   state.insolventSeconds = after;
 
   if (before === 0) {
-    bus.emit('log', { message: `⚠️ Sem renda e sem dinheiro para investir. Falência em ${BANKRUPTCY_LIMIT_SEC}s!` });
-  } else if (before < BANKRUPTCY_LIMIT_SEC - BANKRUPTCY_WARNING_SEC && after >= BANKRUPTCY_LIMIT_SEC - BANKRUPTCY_WARNING_SEC) {
+    bus.emit('log', {
+      message: `⚠️ Sem renda e sem dinheiro para investir. Falência em ${BANKRUPTCY_LIMIT_SEC}s!`,
+    });
+  } else if (
+    before < BANKRUPTCY_LIMIT_SEC - BANKRUPTCY_WARNING_SEC &&
+    after >= BANKRUPTCY_LIMIT_SEC - BANKRUPTCY_WARNING_SEC
+  ) {
     bus.emit('log', { message: `⏳ Falência em ${BANKRUPTCY_WARNING_SEC}s!` });
   }
 

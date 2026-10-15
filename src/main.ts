@@ -37,7 +37,9 @@ const mapRenderer = new MapRenderer(mapContainer, state);
 
 // >>> MAPA: re-renderiza apenas quando marcado como sujo (bus.emit('map:dirty'))
 let mapDirty = true;
-bus.on('map:dirty', () => { mapDirty = true; });
+bus.on('map:dirty', () => {
+  mapDirty = true;
+});
 
 /** Render completo da interface. */
 function render(): void {

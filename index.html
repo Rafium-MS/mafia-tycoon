@@ -1,44 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Máfia Tycoon</title>
-</head>
-<body>
-  <main id="app">
-    <h1>🔫 MÁFIA TYCOON</h1>
-    <div class="stats" aria-label="Status da família">
-      <div class="stat"><div class="label">Dinheiro</div><div class="value">R$ <span id="money">0</span></div></div>
-      <div class="stat"><div class="label">Respeito</div><div class="value"><span id="respect">0</span></div></div>
-      <div class="stat"><div class="label">Calor Policial</div><div class="value"><span id="heat">0</span>%</div></div>
-      <div class="stat"><div class="label">Lealdade</div><div class="value"><span id="loyalty">100</span>%</div></div>
-    </div>
-    <div class="heat-container" role="progressbar" aria-label="Nível de calor policial"><div id="heat-bar"></div></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Máfia Tycoon</title>
+  </head>
+  <body>
+    <main id="app">
+      <h1>🔫 MÁFIA TYCOON</h1>
+      <div class="stats" aria-label="Status da família">
+        <div class="stat">
+          <div class="label">Dinheiro</div>
+          <div class="value">R$ <span id="money">0</span></div>
+        </div>
+        <div class="stat">
+          <div class="label">Respeito</div>
+          <div class="value"><span id="respect">0</span></div>
+        </div>
+        <div class="stat">
+          <div class="label">Calor Policial</div>
+          <div class="value"><span id="heat">0</span>%</div>
+        </div>
+        <div class="stat">
+          <div class="label">Lealdade</div>
+          <div class="value"><span id="loyalty">100</span>%</div>
+        </div>
+      </div>
+      <div class="heat-container" role="progressbar" aria-label="Nível de calor policial">
+        <div id="heat-bar"></div>
+      </div>
 
-    <!-- MAPA -->
-    <h2>🗺️ Mapa da Cidade</h2>
-    <div id="map" class="map-container"></div>
+      <!-- MAPA -->
+      <h2>🗺️ Mapa da Cidade</h2>
+      <div id="map" class="map-container"></div>
 
-    <div class="actions">
-      <button id="bribe">💸 Subornar Polícia (-20 calor) — R$ 200</button>
-      <button id="pay">🤝 Pagar Família (+10 lealdade) — R$ 100</button>
-      <button id="recruit">👤 Recrutar Capanga — R$ <span id="recruit-cost">0</span></button>
-      <span style="align-self:center; color:#d4a574;">Capangas: <strong id="crew">0</strong></span>
-    </div>
+      <div class="actions">
+        <button id="bribe">💸 Subornar Polícia (-20 calor) — R$ 200</button>
+        <button id="pay">🤝 Pagar Família (+10 lealdade) — R$ 100</button>
+        <button id="recruit">👤 Recrutar Capanga — R$ <span id="recruit-cost">0</span></button>
+        <span style="align-self: center; color: #d4a574"
+          >Capangas: <strong id="crew">0</strong></span
+        >
+      </div>
 
-    <h2>⚔️ Batalhas Ativas</h2>
-    <div id="battles"></div>
+      <h2>⚔️ Batalhas Ativas</h2>
+      <div id="battles"></div>
 
-    <h2>🛡️ Defesa dos Territórios</h2>
-    <div id="reinforce"></div>
+      <h2>🛡️ Defesa dos Territórios</h2>
+      <div id="reinforce"></div>
 
-    <h2>🏴 Esquemas</h2>
-    <div id="businesses"></div>
+      <h2>🏴 Esquemas</h2>
+      <div id="businesses"></div>
 
-    <h2>📜 Registro</h2>
-    <div id="log" class="log" aria-live="polite"></div>
-  </main>
-  <script type="module" src="/src/main.ts"></script>
-</body>
+      <h2>📜 Registro</h2>
+      <div id="log" class="log" aria-live="polite"></div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

@@ -3,7 +3,7 @@ import type { GameState, TerritoryId, FactionId, Battle } from '../types/game';
 import { bus } from '../core/EventBus';
 import { FACTION_DEFS } from '../data/territories';
 
-const RIVAL_TICK_INTERVAL = 5;   // IA age a cada 5s
+const RIVAL_TICK_INTERVAL = 5; // IA age a cada 5s
 const RIVAL_POWER_CAP_MULTIPLIER = 2; // teto de poder = 2x o poder inicial da facção
 
 /** Poder máximo que uma facção pode acumular crescendo sozinha. */
@@ -26,7 +26,7 @@ export function tickRivals(state: GameState, deltaSec: number): void {
   for (const faction of Object.values(state.factions)) {
     if (faction.id === 'player' || faction.id === 'police') continue;
     const cap = getFactionPowerCap(faction.id);
-    const hasTerritory = Object.values(state.territories).some(t => t.owner === faction.id);
+    const hasTerritory = Object.values(state.territories).some((t) => t.owner === faction.id);
     if (hasTerritory) faction.power += faction.aggression * 2;
     // O clamp também corrige saves antigos que cresceram sem limite
     faction.power = Math.min(faction.power, cap);
@@ -51,8 +51,7 @@ export function tickRivals(state: GameState, deltaSec: number): void {
 }
 
 function pickTargets(state: GameState, faction: FactionId): TerritoryId[] {
-  const factionTerritories = Object.values(state.territories)
-    .filter(t => t.owner === faction);
+  const factionTerritories = Object.values(state.territories).filter((t) => t.owner === faction);
 
   if (factionTerritories.length === 0) return [];
 
@@ -83,7 +82,7 @@ function initiateRivalAttack(state: GameState, attacker: FactionId, targetId: Te
   const attackerFaction = state.factions[attacker];
 
   // Se já existe batalha nesse território, ignora
-  if (state.activeBattles.some(b => b.territoryId === targetId)) return;
+  if (state.activeBattles.some((b) => b.territoryId === targetId)) return;
 
   const battle: Battle = {
     territoryId: targetId,
@@ -98,7 +97,10 @@ function initiateRivalAttack(state: GameState, attacker: FactionId, targetId: Te
 
   if (territory.owner === 'player') {
     bus.emit('log', { message: `🚨 ${attackerFaction.name} está atacando ${territory.name}!` });
-    bus.emit('rival_attack', { message: `${attackerFaction.name} ataca ${territory.name}`, faction: attacker });
+    bus.emit('rival_attack', {
+      message: `${attackerFaction.name} ataca ${territory.name}`,
+      faction: attacker,
+    });
   }
   bus.emit('map:dirty', {});
 }
@@ -107,6 +109,6 @@ function initiateRivalAttack(state: GameState, attacker: FactionId, targetId: Te
  * Reduz calor quando jogador mantém territórios em paz (incentiva equilíbrio).
  */
 export function getPassiveHeatReduction(state: GameState): number {
-  const controlled = Object.values(state.territories).filter(t => t.owner === 'player').length;
+  const controlled = Object.values(state.territories).filter((t) => t.owner === 'player').length;
   return controlled * 0.1; // cada território reduz um pouco o calor passivo
 }

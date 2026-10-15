@@ -18,7 +18,7 @@ export class EventBus {
 
   emit<K extends keyof EventMap>(event: K, payload: EventMap[K]): void {
     const list: Handler<EventMap[K]>[] | undefined = this.handlers[event];
-    list?.forEach(h => h(payload));
+    list?.forEach((h) => h(payload));
   }
 }
 

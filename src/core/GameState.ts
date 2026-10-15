@@ -2,7 +2,15 @@
 
 import { BUSINESS_DEFS } from '../data/businesses';
 import { TERRITORY_DEFS, FACTION_DEFS } from '../data/territories';
-import type { GameState, Business, BusinessId, Territory, TerritoryId, Faction, FactionId } from '../types/game';
+import type {
+  GameState,
+  Business,
+  BusinessId,
+  Territory,
+  TerritoryId,
+  Faction,
+  FactionId,
+} from '../types/game';
 
 export function createInitialState(): GameState {
   const businesses = {} as Record<BusinessId, Business>;
@@ -29,7 +37,7 @@ export function createInitialState(): GameState {
     territories,
     factions,
     activeBattles: [],
-    crew: 1,               // um capanga inicial para permitir o primeiro ataque
+    crew: 1, // um capanga inicial para permitir o primeiro ataque
     crewInBattle: 0,
     gameOver: false,
     insolventSeconds: 0,

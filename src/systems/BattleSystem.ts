@@ -3,8 +3,8 @@ import type { GameState, TerritoryId, Battle } from '../types/game';
 import { bus } from '../core/EventBus';
 import { getPlayerAttackPower, getConquestCost, CONQUERED_DEFENSE } from './TerritorySystem';
 
-const BATTLE_TICK_INTERVAL = 2;      // batalhas resolvem a cada 2s
-const CREW_LOSS_CHANCE = 0.15;       // chance de perder 1 capanga por resolução
+const BATTLE_TICK_INTERVAL = 2; // batalhas resolvem a cada 2s
+const CREW_LOSS_CHANCE = 0.15; // chance de perder 1 capanga por resolução
 
 // Timer de resolução de batalhas (fora do estado serializável)
 let battleTimer = 0;
@@ -17,7 +17,7 @@ export function startPlayerAttack(state: GameState, id: TerritoryId): boolean {
   if (!target || target.owner === 'player') return false;
 
   // Já existe batalha neste território?
-  if (state.activeBattles.some(b => b.territoryId === id)) return false;
+  if (state.activeBattles.some((b) => b.territoryId === id)) return false;
 
   const cost = getConquestCost(state, id);
   const attackPower = getPlayerAttackPower(state);
@@ -132,6 +132,6 @@ export function tickBattles(state: GameState, deltaSec: number): void {
 
 /** Libera os capangas quando as batalhas do jogador terminam. */
 function releasePlayerCrew(state: GameState): void {
-  const playerStillFighting = state.activeBattles.some(b => b.attacker === 'player');
+  const playerStillFighting = state.activeBattles.some((b) => b.attacker === 'player');
   if (!playerStillFighting) state.crewInBattle = 0;
 }

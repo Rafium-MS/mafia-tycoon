@@ -1,10 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { GameState } from '../types/game';
 import { createInitialState, getCost } from '../core/GameState';
-import { tickEconomy, buyBusiness, getNetIncomePerSec, isInsolvent, tickBankruptcy } from './EconomySystem';
+import {
+  tickEconomy,
+  buyBusiness,
+  getNetIncomePerSec,
+  isInsolvent,
+  tickBankruptcy,
+} from './EconomySystem';
 
 let state: GameState;
-beforeEach(() => { state = createInitialState(); });
+beforeEach(() => {
+  state = createInitialState();
+});
 
 describe('getCost', () => {
   it('cresce 1.15x por unidade comprada', () => {
