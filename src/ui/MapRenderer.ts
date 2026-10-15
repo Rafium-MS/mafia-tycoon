@@ -1,7 +1,12 @@
 // src/ui/MapRenderer.ts
 import type { GameState, TerritoryId } from '../types/game';
 import { TERRITORY_POSITIONS, TERRITORY_SHORT_NAMES } from '../data/territories';
-import { canAttack, getConquestCost, canReinforce, getReinforceCost } from '../systems/TerritorySystem';
+import {
+  canAttack,
+  getConquestCost,
+  canReinforce,
+  getReinforceCost,
+} from '../systems/TerritorySystem';
 import { startPlayerAttack } from '../systems/BattleSystem';
 import { bus } from '../core/EventBus';
 
@@ -100,7 +105,7 @@ export class MapRenderer {
       const faction = this.state.factions[territory.owner];
       const isPlayer = territory.owner === 'player';
       const attackable = canAttack(this.state, territory.id);
-      const inBattle = this.state.activeBattles.some(b => b.territoryId === territory.id);
+      const inBattle = this.state.activeBattles.some((b) => b.territoryId === territory.id);
 
       const group = document.createElementNS(SVG_NS, 'g');
       group.classList.add('territory-node');
@@ -140,7 +145,7 @@ export class MapRenderer {
       ownerText.setAttribute('text-anchor', 'middle');
       ownerText.classList.add('territory-owner');
       ownerText.setAttribute('fill', faction.color);
-      ownerText.textContent = isPlayer ? 'SUA' : faction.name.split(' ')[1] ?? faction.name;
+      ownerText.textContent = isPlayer ? 'SUA' : (faction.name.split(' ')[1] ?? faction.name);
       group.appendChild(ownerText);
 
       // Defesa (quando em batalha ou relevante)

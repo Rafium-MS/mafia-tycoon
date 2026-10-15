@@ -6,7 +6,9 @@ import { tickLoyalty, payCrew } from './LoyaltySystem';
 import { getCrewRecruitCost, recruitCrew, tickCrewUpkeep } from './CrewSystem';
 
 let state: GameState;
-beforeEach(() => { state = createInitialState(); });
+beforeEach(() => {
+  state = createInitialState();
+});
 
 describe('HeatSystem', () => {
   it('calor sobe com esquemas e é limitado a 0-100', () => {

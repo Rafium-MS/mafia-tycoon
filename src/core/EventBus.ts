@@ -3,16 +3,22 @@ import type { EventMap } from './EventMap';
 
 type Handler<T> = (payload: T) => void;
 
-export class EventBus {
-  private handlers = new Map<keyof EventMap, Handler<any>[]>();
+/** Handlers indexados por evento, cada lista tipada com o payload do seu evento. */
+type HandlerMap = { [K in keyof EventMap]?: Handler<EventMap[K]>[] };
 
-  on<K extends keyof EventMap>(event: K, handler: (payload: EventMap[K]) => void): void {
-    if (!this.handlers.has(event)) this.handlers.set(event, []);
-    this.handlers.get(event)!.push(handler);
+export class EventBus {
+  private handlers: HandlerMap = {};
+
+  on<K extends keyof EventMap>(event: K, handler: Handler<EventMap[K]>): void {
+    const list: Handler<EventMap[K]>[] = this.handlers[event] ?? [];
+    list.push(handler);
+    // O TS não consegue provar escrita em índice genérico (K); a leitura acima já é tipada
+    this.handlers[event] = list as HandlerMap[K];
   }
 
   emit<K extends keyof EventMap>(event: K, payload: EventMap[K]): void {
-    this.handlers.get(event)?.forEach(h => h(payload));
+    const list: Handler<EventMap[K]>[] | undefined = this.handlers[event];
+    list?.forEach((h) => h(payload));
   }
 }
 

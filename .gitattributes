@@ -1,0 +1,3 @@
+# Mantém LF no repositório e nas cópias locais (o Prettier usa endOfLine: lf)
+* text=auto eol=lf
+*.png binary

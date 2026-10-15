@@ -2,8 +2,8 @@
 import type { GameState } from '../types/game';
 import { bus } from '../core/EventBus';
 
-const HEAT_DECAY_PER_SEC = 0.5;       // calor cai sozinho
-const HEAT_PER_BIZ_RATE = 0.05;       // multiplicador do calor das businesses
+const HEAT_DECAY_PER_SEC = 0.5; // calor cai sozinho
+const HEAT_PER_BIZ_RATE = 0.05; // multiplicador do calor das businesses
 
 export function tickHeat(state: GameState, deltaSec: number): void {
   let heatGain = 0;

@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   test:
-    name: Testes e build
+    name: Lint, testes e build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -26,6 +26,12 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Formatação (Prettier)
+        run: npm run format:check
 
       - name: Testes (Vitest)
         run: npm test

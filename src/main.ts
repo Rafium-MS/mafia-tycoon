@@ -28,7 +28,7 @@ import {
 const SAVE_KEY = 'mafia-tycoon-save';
 const LOG_LIMIT = 50;
 
-let state: GameState = loadGame() ?? createInitialState();
+const state: GameState = loadGame() ?? createInitialState();
 const loop = new GameLoop(state, render);
 
 // Cria o mapa UMA VEZ (ele se auto-renderiza)
@@ -37,7 +37,9 @@ const mapRenderer = new MapRenderer(mapContainer, state);
 
 // >>> MAPA: re-renderiza apenas quando marcado como sujo (bus.emit('map:dirty'))
 let mapDirty = true;
-bus.on('map:dirty', () => { mapDirty = true; });
+bus.on('map:dirty', () => {
+  mapDirty = true;
+});
 
 /** Render completo da interface. */
 function render(): void {

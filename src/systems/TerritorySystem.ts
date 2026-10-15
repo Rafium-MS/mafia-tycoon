@@ -30,7 +30,9 @@ export function getReinforceCap(id: TerritoryId): number {
 
 /** Custo do próximo reforço: cresce com a defesa atual (fortificar fica mais caro). */
 export function getReinforceCost(state: GameState, id: TerritoryId): number {
-  return Math.floor(REINFORCE_BASE_COST + REINFORCE_COST_PER_DEFENSE * state.territories[id].defense);
+  return Math.floor(
+    REINFORCE_BASE_COST + REINFORCE_COST_PER_DEFENSE * state.territories[id].defense,
+  );
 }
 
 /** Só territórios do jogador abaixo do teto podem ser reforçados (inclusive em batalha). */
@@ -59,7 +61,7 @@ export function reinforceTerritory(state: GameState, id: TerritoryId): boolean {
 export function tickTerritoryDefense(state: GameState, deltaSec: number): void {
   let changed = false;
   for (const t of Object.values(state.territories)) {
-    if (state.activeBattles.some(b => b.territoryId === t.id)) continue;
+    if (state.activeBattles.some((b) => b.territoryId === t.id)) continue;
     const max = getMaxDefense(t.id);
     if (t.defense >= max) continue;
     const before = Math.round(t.defense);
@@ -86,8 +88,8 @@ export function getBusinessMultiplier(state: GameState, business: BusinessId): n
 
 export function getPlayerTerritories(state: GameState): TerritoryId[] {
   return Object.values(state.territories)
-    .filter(t => t.owner === 'player')
-    .map(t => t.id);
+    .filter((t) => t.owner === 'player')
+    .map((t) => t.id);
 }
 
 /**
@@ -95,7 +97,7 @@ export function getPlayerTerritories(state: GameState): TerritoryId[] {
  */
 export function checkVictory(state: GameState): void {
   const all = Object.values(state.territories);
-  if (!all.every(t => t.owner === 'player')) return;
+  if (!all.every((t) => t.owner === 'player')) return;
   state.gameOver = true;
   state.won = true;
   state.gameOverReason = 'A cidade inteira é sua. Ninguém mais ousa te desafiar.';
@@ -108,7 +110,7 @@ export function checkVictory(state: GameState): void {
 export function canAttack(state: GameState, id: TerritoryId): boolean {
   const target = state.territories[id];
   if (target.owner === 'player') return false;
-  return target.neighbors.some(nId => state.territories[nId].owner === 'player');
+  return target.neighbors.some((nId) => state.territories[nId].owner === 'player');
 }
 
 /**
@@ -125,7 +127,9 @@ export function getPlayerAttackPower(state: GameState): number {
 export function getConquestCost(state: GameState, id: TerritoryId): number {
   const t = state.territories[id];
   // Cada vizinho do jogador dá um pequeno desconto (cercar o alvo)
-  const friendlyNeighbors = t.neighbors.filter(n => state.territories[n].owner === 'player').length;
+  const friendlyNeighbors = t.neighbors.filter(
+    (n) => state.territories[n].owner === 'player',
+  ).length;
   const discounted = t.conquestCost * (1 - friendlyNeighbors * SIEGE_DISCOUNT_PER_NEIGHBOR);
   return Math.max(MIN_CONQUEST_COST, Math.floor(discounted));
 }

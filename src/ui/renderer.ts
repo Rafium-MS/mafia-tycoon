@@ -2,7 +2,14 @@
 import type { GameState, BusinessId, TerritoryId } from '../types/game';
 import { getCost } from '../core/GameState';
 import { getCrewRecruitCost } from '../systems/CrewSystem';
-import { getConquestCost, canAttack, canReinforce, getReinforceCost, getReinforceCap, REINFORCE_AMOUNT } from '../systems/TerritorySystem';
+import {
+  getConquestCost,
+  canAttack,
+  canReinforce,
+  getReinforceCost,
+  getReinforceCap,
+  REINFORCE_AMOUNT,
+} from '../systems/TerritorySystem';
 
 const $ = (id: string): HTMLElement => {
   const el = document.getElementById(id);
@@ -42,7 +49,9 @@ export function renderBusinesses(state: GameState): void {
 
   for (const [id, b] of Object.entries(state.businesses)) {
     if (!b.unlocked) {
-      fragments.push(`<div class="biz locked">🔒 ${b.name} (Requer ${b.requiresRespect} respeito)</div>`);
+      fragments.push(
+        `<div class="biz locked">🔒 ${b.name} (Requer ${b.requiresRespect} respeito)</div>`,
+      );
       continue;
     }
     const cost = getCost(b);
@@ -60,8 +69,10 @@ export function renderBusinesses(state: GameState): void {
 
   setHTML(list, fragments.join(''));
 
-  ($('bribe') as HTMLButtonElement).textContent = `💸 Subornar Polícia (-${BRIBE_HEAT_REDUCTION} calor) — R$ ${BRIBE_COST}`;
-  ($('pay') as HTMLButtonElement).textContent = `🤝 Pagar Família (+10 lealdade) — R$ ${PAY_CREW_COST}`;
+  ($('bribe') as HTMLButtonElement).textContent =
+    `💸 Subornar Polícia (-${BRIBE_HEAT_REDUCTION} calor) — R$ ${BRIBE_COST}`;
+  ($('pay') as HTMLButtonElement).textContent =
+    `🤝 Pagar Família (+10 lealdade) — R$ ${PAY_CREW_COST}`;
 }
 
 /** Renderiza o mapa de territórios. */
@@ -73,7 +84,7 @@ export function renderTerritories(state: GameState): void {
     const owner = state.factions[t.owner];
     const attackable = canAttack(state, t.id);
     const cost = getConquestCost(state, t.id);
-    const battle = state.activeBattles.find(b => b.territoryId === t.id);
+    const battle = state.activeBattles.find((b) => b.territoryId === t.id);
 
     let actionHtml = '';
     if (battle) {
@@ -112,20 +123,27 @@ function setText(el: Element, text: string): void {
  */
 export function renderReinforce(state: GameState): void {
   const container = $('reinforce');
-  const owned = Object.values(state.territories).filter(t => t.owner === 'player');
+  const owned = Object.values(state.territories).filter((t) => t.owner === 'player');
 
-  const rows = owned.map(t => `
+  const rows = owned.map(
+    (t) => `
       <div class="biz">
         <div>
           <strong>${t.name}</strong>
           <div class="desc">🛡 Defesa <span data-defense="${t.id}"></span> / ${getReinforceCap(t.id)}</div>
         </div>
-        ${canReinforce(state, t.id)
-          ? `<button data-reinforce="${t.id}"></button>`
-          : `<span class="desc">Fortificação máxima</span>`}
+        ${
+          canReinforce(state, t.id)
+            ? `<button data-reinforce="${t.id}"></button>`
+            : `<span class="desc">Fortificação máxima</span>`
+        }
       </div>
-    `);
-  setHTML(container, rows.length ? rows.join('') : '<div class="desc">Você não controla nenhum território.</div>');
+    `,
+  );
+  setHTML(
+    container,
+    rows.length ? rows.join('') : '<div class="desc">Você não controla nenhum território.</div>',
+  );
 
   for (const t of owned) {
     const defense = container.querySelector(`[data-defense="${t.id}"]`);
@@ -154,23 +172,31 @@ export function renderBattles(state: GameState): void {
     setHTML(container, '<div class="desc">Nenhuma batalha em andamento.</div>');
     return;
   }
-  setHTML(container, state.activeBattles.map(b => {
-    const t = state.territories[b.territoryId];
-    const attacker = state.factions[b.attacker];
-    const defender = state.factions[b.defender];
-    return `<div class="battle-row">
+  setHTML(
+    container,
+    state.activeBattles
+      .map((b) => {
+        const t = state.territories[b.territoryId];
+        const attacker = state.factions[b.attacker];
+        const defender = state.factions[b.defender];
+        return `<div class="battle-row">
       ${attacker.name} ⚔️ ${defender.name} — ${t.name} • Defesa restante: ${t.defense.toFixed(0)}
     </div>`;
-  }).join(''));
+      })
+      .join(''),
+  );
 }
 
 /** Renderiza o log de eventos (últimos 8). */
 export function renderLog(state: GameState): void {
   const container = $('log');
   const recent = state.log.slice(-8).reverse();
-  setHTML(container, recent.length
-    ? recent.map(m => `<div class="log-entry">${m}</div>`).join('')
-    : '<div class="desc">Sem novidades… por enquanto.</div>');
+  setHTML(
+    container,
+    recent.length
+      ? recent.map((m) => `<div class="log-entry">${m}</div>`).join('')
+      : '<div class="desc">Sem novidades… por enquanto.</div>',
+  );
 }
 
 /** Tela de fim de jogo (vitória ou derrota). */
@@ -182,7 +208,7 @@ export function renderGameOver(state: GameState): void {
     <p>${state.gameOverReason ?? fallback}</p>
     <p>Dinheiro final: R$ ${state.money.toFixed(0)}</p>
     <p>Respeito: ${state.respect.toFixed(0)}</p>
-    <p>Territórios conquistados: ${Object.values(state.territories).filter(t => t.owner === 'player').length}</p>
+    <p>Territórios conquistados: ${Object.values(state.territories).filter((t) => t.owner === 'player').length}</p>
     <button id="restart">${state.won ? '🔄 Jogar de novo' : '🔄 Recomeçar'}</button>
   `;
 }
