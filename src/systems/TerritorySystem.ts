@@ -11,10 +11,45 @@ const MIN_CONQUEST_COST = 100; // clamp: custo nunca fica irrisório
 export const CONQUERED_DEFENSE = 30;
 /** Tempo (s) para a defesa ir de 0 ao máximo fora de batalha. */
 const DEFENSE_REGEN_FULL_SEC = 30;
+/** Defesa adicionada por reforço comprado pelo jogador. */
+export const REINFORCE_AMOUNT = 20;
+/** Reforços podem levar a defesa até este múltiplo do máximo natural. */
+const REINFORCE_CAP_MULTIPLIER = 3;
+const REINFORCE_BASE_COST = 100;
+const REINFORCE_COST_PER_DEFENSE = 10;
 
 /** Defesa máxima: a original do território, nunca abaixo da defesa pós-conquista. */
 export function getMaxDefense(id: TerritoryId): number {
   return Math.max(TERRITORY_DEFS[id].defense, CONQUERED_DEFENSE);
+}
+
+/** Teto de defesa alcançável com reforços. */
+export function getReinforceCap(id: TerritoryId): number {
+  return getMaxDefense(id) * REINFORCE_CAP_MULTIPLIER;
+}
+
+/** Custo do próximo reforço: cresce com a defesa atual (fortificar fica mais caro). */
+export function getReinforceCost(state: GameState, id: TerritoryId): number {
+  return Math.floor(REINFORCE_BASE_COST + REINFORCE_COST_PER_DEFENSE * state.territories[id].defense);
+}
+
+/** Só territórios do jogador abaixo do teto podem ser reforçados (inclusive em batalha). */
+export function canReinforce(state: GameState, id: TerritoryId): boolean {
+  const t = state.territories[id];
+  return t.owner === 'player' && t.defense < getReinforceCap(id);
+}
+
+/** Jogador paga para aumentar a defesa de um território seu. */
+export function reinforceTerritory(state: GameState, id: TerritoryId): boolean {
+  if (!canReinforce(state, id)) return false;
+  const cost = getReinforceCost(state, id);
+  if (state.money < cost) return false;
+  const t = state.territories[id];
+  state.money -= cost;
+  t.defense = Math.min(getReinforceCap(id), t.defense + REINFORCE_AMOUNT);
+  bus.emit('log', { message: `🛡️ ${t.name} reforçado. Defesa: ${t.defense.toFixed(0)}` });
+  bus.emit('map:dirty', {});
+  return true;
 }
 
 /**

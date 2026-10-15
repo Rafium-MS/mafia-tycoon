@@ -1,7 +1,7 @@
 // src/ui/MapRenderer.ts
 import type { GameState, TerritoryId } from '../types/game';
 import { TERRITORY_POSITIONS, TERRITORY_SHORT_NAMES } from '../data/territories';
-import { canAttack, getConquestCost } from '../systems/TerritorySystem';
+import { canAttack, getConquestCost, canReinforce, getReinforceCost } from '../systems/TerritorySystem';
 import { startPlayerAttack } from '../systems/BattleSystem';
 import { bus } from '../core/EventBus';
 
@@ -128,7 +128,7 @@ export class MapRenderer {
       group.appendChild(ownerText);
 
       // Defesa (quando em batalha ou relevante)
-      if (inBattle || (!isPlayer && attackable)) {
+      if (inBattle || isPlayer || attackable) {
         const defenseText = document.createElementNS(SVG_NS, 'text');
         defenseText.setAttribute('y', '32');
         defenseText.setAttribute('text-anchor', 'middle');
@@ -181,6 +181,8 @@ export class MapRenderer {
     if (canAttack(this.state, id)) {
       const cost = getConquestCost(this.state, id);
       lines.push(`---`, `Custo de ataque: R$ ${cost}`);
+    } else if (canReinforce(this.state, id)) {
+      lines.push(`---`, `Reforço: R$ ${getReinforceCost(this.state, id)}`);
     }
     return lines.join('\n');
   }

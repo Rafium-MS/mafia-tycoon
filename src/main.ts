@@ -9,6 +9,7 @@ import { bribePolice } from './systems/HeatSystem';
 import { payCrew } from './systems/LoyaltySystem';
 import { recruitCrew } from './systems/CrewSystem';
 import { startPlayerAttack } from './systems/BattleSystem';
+import { reinforceTerritory } from './systems/TerritorySystem';
 import { MapRenderer } from './ui/MapRenderer';
 import type { BusinessId, TerritoryId, GameState } from './types/game';
 import {
@@ -16,6 +17,7 @@ import {
   renderBusinesses,
   renderCrew,
   renderBattles,
+  renderReinforce,
   renderLog,
   renderGameOver,
   BRIBE_COST,
@@ -53,6 +55,7 @@ function render(): void {
   }
   renderCrew(state);
   renderBattles(state);
+  renderReinforce(state);
   renderLog(state);
 }
 
@@ -114,6 +117,8 @@ document.addEventListener('click', (e) => {
     buyBusiness(state, target.dataset.id as BusinessId);
   } else if (target.dataset.attack) {
     startPlayerAttack(state, target.dataset.attack as TerritoryId);
+  } else if (target.dataset.reinforce) {
+    reinforceTerritory(state, target.dataset.reinforce as TerritoryId);
   } else if (target.id === 'recruit') {
     recruitCrew(state);
   } else if (target.id === 'bribe') {

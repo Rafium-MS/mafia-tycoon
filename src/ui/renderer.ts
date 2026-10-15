@@ -2,7 +2,7 @@
 import type { GameState, BusinessId, TerritoryId } from '../types/game';
 import { getCost } from '../core/GameState';
 import { getCrewRecruitCost } from '../systems/CrewSystem';
-import { getConquestCost, canAttack } from '../systems/TerritorySystem';
+import { getConquestCost, canAttack, canReinforce, getReinforceCost, getReinforceCap, REINFORCE_AMOUNT } from '../systems/TerritorySystem';
 
 const $ = (id: string): HTMLElement => {
   const el = document.getElementById(id);
@@ -97,6 +97,32 @@ export function renderTerritories(state: GameState): void {
   }
 
   setHTML(container, fragments.join(''));
+}
+
+/** Renderiza os reforços de defesa dos territórios do jogador. */
+export function renderReinforce(state: GameState): void {
+  const container = $('reinforce');
+  const fragments: string[] = [];
+
+  for (const t of Object.values(state.territories)) {
+    if (t.owner !== 'player') continue;
+    const cap = getReinforceCap(t.id);
+    const cost = getReinforceCost(state, t.id);
+    const action = canReinforce(state, t.id)
+      ? `<button data-reinforce="${t.id}" ${state.money >= cost ? '' : 'disabled'}>Reforçar +${REINFORCE_AMOUNT} (R$ ${cost})</button>`
+      : `<span class="desc">Fortificação máxima</span>`;
+    fragments.push(`
+      <div class="biz">
+        <div>
+          <strong>${t.name}</strong>
+          <div class="desc">🛡 Defesa ${t.defense.toFixed(0)} / ${cap}</div>
+        </div>
+        ${action}
+      </div>
+    `);
+  }
+
+  setHTML(container, fragments.length ? fragments.join('') : '<div class="desc">Você não controla nenhum território.</div>');
 }
 
 /** Renderiza a seção de capangas. */

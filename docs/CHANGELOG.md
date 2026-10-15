@@ -8,6 +8,7 @@ Versionamento semântico: MAJOR.MINOR.PATCH.
 ### Adicionado
 - Condição de vitória: controlar os 5 territórios encerra a partida com a tela "👑 VITÓRIA"
 - Derrota por falência prolongada: 60s seguidos insolvente (renda líquida ≤ 0 e dinheiro abaixo do esquema mais barato), com avisos no registro
+- Reforço de defesa: botão por território do jogador (+20 por R$ 100 + 10 × defesa atual, até 3× o máximo), também durante batalhas; o mapa passa a mostrar a defesa dos territórios do jogador
 - Defesa dos territórios se recupera fora de batalha: do zero ao máximo (defesa original, mínimo 30) em 30s
 - Teto de poder das facções rivais: crescem até 2× o poder inicial e param de crescer sem território
 - Esquemas geram respeito passivo (`baseRespect`), tornando Contrabando e Cassino alcançáveis
